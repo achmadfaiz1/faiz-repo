@@ -218,7 +218,7 @@ export default function OnePagePortfolio() {
 
   const projects = [
     {
-      name: "Project Atlas",
+      name: "PAC Data Warehouse Project",
       company: "GoTo HoldCo",
       year: "2022",
       summary:
