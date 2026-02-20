@@ -399,7 +399,7 @@ export default function OnePagePortfolio() {
         <div className="grid gap-4 sm:grid-cols-2">
           {[
             "Built inhouse HR Performance Management Tools in collaboration with the internal engineer team used by our Employee, HR, and Leaders for performance development and future decisions",
-            "Improved performance data visibility across multiple business units, and Developed scalable analytics report using BigQuery and SQL to support strategic people planning with data-driven insights",
+            "Improved performance data visibility across multiple business units, and developed scalable analytics report using BigQuery and SQL to support strategic people planning with data-driven insights",
           ].map((item, i) => (
             <div
               key={i}
