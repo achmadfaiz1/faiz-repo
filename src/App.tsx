@@ -184,7 +184,6 @@ export default function OnePagePortfolio() {
           className="w-full h-full object-cover"
         />
 
-        {/* overlay for readability */}
         <div
           className={`absolute inset-0 ${
             darkMode ? "bg-[#020617]/70" : "bg-white/60"
@@ -211,7 +210,7 @@ export default function OnePagePortfolio() {
         animate={{ y: 0, opacity: 1 }}
         className="fixed top-6 left-0 right-0 z-50 flex justify-center pointer-events-none"
       >
-        <div className="backdrop-blur-lg border border-white/20 bg-white/10 rounded-full px-6 py-3 flex gap-6 text-sm transition mx-auto w-fit pointer-events-auto">
+        <div className="backdrop-blur-lg border border-white/20 bg-white/10 rounded-full px-3 sm:px-6 py-2 sm:py-3 flex gap-3 sm:gap-6 text-xs sm:text-sm transition mx-auto w-fit pointer-events-auto">
           {navItems.map((item) => (
             <a
               key={item}
@@ -237,7 +236,7 @@ export default function OnePagePortfolio() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <h1 className="text-5xl md:text-7xl font-bold mb-4">
+          <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold mb-4 leading-tight">
             Achmad Faiz
           </h1>
 
@@ -245,7 +244,7 @@ export default function OnePagePortfolio() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
-            className={`text-xl mb-6 ${mutedText}`}
+            className={`text-base sm:text-xl mb-6 ${mutedText}`}
           >
             Performance Data Analyst • People Analytics • HR Strategy
           </motion.p>
@@ -253,17 +252,17 @@ export default function OnePagePortfolio() {
       </section>
 
       {/* ABOUT */}
-      <section id="about" className="py-24 px-6 max-w-4xl mx-auto">
-        <h2 className="text-3xl font-bold mb-6">About Me</h2>
-        <p className={`text-lg leading-relaxed ${mutedText}`}>
+      <section id="about" className="py-16 sm:py-24 px-4 sm:px-6 max-w-4xl mx-auto">
+        <h2 className="text-2xl sm:text-3xl font-bold mb-6">About Me</h2>
+        <p className={`text-base sm:text-lg leading-relaxed ${mutedText}`}>
           I am a Performance Data Analyst at GoTo specializing in People
           Analytics, workforce insights, and performance management systems.
         </p>
       </section>
 
       {/* SKILLS */}
-      <section id="skills" className="py-24 px-6 max-w-4xl mx-auto">
-        <h2 className="text-3xl font-bold mb-10">Core Skills</h2>
+      <section id="skills" className="py-16 sm:py-24 px-4 sm:px-6 max-w-4xl mx-auto">
+        <h2 className="text-2xl sm:text-3xl font-bold mb-8 sm:mb-10">Core Skills</h2>
         <div className="space-y-6">
           {skills.map((skill, index) => (
             <motion.div
@@ -297,14 +296,14 @@ export default function OnePagePortfolio() {
       </section>
 
       {/* EXPERIENCE */}
-      <section id="experience" className="py-24 px-6 max-w-4xl mx-auto">
-        <h2 className="text-3xl font-bold mb-10">Experience</h2>
+      <section id="experience" className="py-16 sm:py-24 px-4 sm:px-6 max-w-4xl mx-auto">
+        <h2 className="text-2xl sm:text-3xl font-bold mb-8 sm:mb-10">Experience</h2>
         <div className="space-y-6">
           {experiences.map((exp, index) => (
             <div
               key={`${exp.company}-${exp.role}`}
               onClick={() => setExpanded(expanded === index ? null : index)}
-              className={`border p-6 rounded-xl transition cursor-pointer ${cardBaseClasses} ${
+              className={`border p-4 sm:p-6 rounded-xl transition cursor-pointer ${cardBaseClasses} ${
                 expanded === index
                   ? "border-blue-400 shadow-lg shadow-blue-500/10 ring-1 ring-blue-400/40"
                   : "hover:border-blue-400"
@@ -331,8 +330,8 @@ export default function OnePagePortfolio() {
       </section>
 
       {/* PROJECTS */}
-      <section id="projects" className="py-24 px-6 max-w-4xl mx-auto">
-        <h2 className="text-3xl font-bold mb-10">Projects</h2>
+      <section id="projects" className="py-16 sm:py-24 px-4 sm:px-6 max-w-4xl mx-auto">
+        <h2 className="text-2xl sm:text-3xl font-bold mb-8 sm:mb-10">Projects</h2>
 
         <div className="space-y-6">
           {projects.map((project, index) => (
@@ -341,7 +340,7 @@ export default function OnePagePortfolio() {
               onClick={() =>
                 setExpanded(expanded === index + 100 ? null : index + 100)
               }
-              className={`border p-6 rounded-xl transition cursor-pointer ${cardBaseClasses} ${
+              className={`border p-4 sm:p-6 rounded-xl transition cursor-pointer ${cardBaseClasses} ${
                 expanded === index + 100
                   ? "border-purple-400 shadow-lg shadow-purple-500/10"
                   : "hover:border-purple-400"
@@ -368,13 +367,13 @@ export default function OnePagePortfolio() {
       </section>
 
       {/* EDUCATION */}
-      <section id="education" className="py-24 px-6 max-w-4xl mx-auto">
-        <h2 className="text-3xl font-bold mb-10">Education</h2>
+      <section id="education" className="py-16 sm:py-24 px-4 sm:px-6 max-w-4xl mx-auto">
+        <h2 className="text-2xl sm:text-3xl font-bold mb-8 sm:mb-10">Education</h2>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          className={`${cardBaseClasses} border p-6 rounded-xl`}
+          className={`${cardBaseClasses} border p-4 sm:p-6 rounded-xl`}
         >
           <h3 className="text-xl font-semibold">
             Universitas Sumatera Utara
@@ -386,14 +385,14 @@ export default function OnePagePortfolio() {
       </section>
 
       {/* CERTIFICATIONS */}
-      <section id="certifications" className="py-24 px-6 max-w-4xl mx-auto">
-        <h2 className="text-3xl font-bold mb-10">Certifications</h2>
+      <section id="certifications" className="py-16 sm:py-24 px-4 sm:px-6 max-w-4xl mx-auto">
+        <h2 className="text-2xl sm:text-3xl font-bold mb-8 sm:mb-10">Certifications</h2>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className={`${cardBaseClasses} border p-6 rounded-xl hover:border-purple-400 transition`}
+          className={`${cardBaseClasses} border p-4 sm:p-6 rounded-xl hover:border-purple-400 transition`}
         >
           <h3 className="text-xl font-semibold">
             BI-University Advanced Stream
@@ -414,7 +413,7 @@ export default function OnePagePortfolio() {
       <section id="contact" className="py-24 px-6 text-center">
         <h2 className="text-3xl font-bold mb-6">Let’s Work Together</h2>
 
-        <div className="flex justify-center gap-6">
+        <div className="flex justify-center gap-4 sm:gap-6">
           <a
             href="mailto:achmad.f.faiz@gmail.com"
             className="hover:text-blue-400"
