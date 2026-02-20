@@ -146,7 +146,7 @@ export default function OnePagePortfolio() {
       items: [
         { name: "Project Management", level: 90 },
         { name: "Stakeholder Management", level: 95 },
-        { name: "Product Management", level: 85 },
+        { name: "Project Management", level: 85 },
         { name: "Researcher", level: 92 },
         { name: "Usability Testing", level: 88 },
         { name: "Working with team or Independent", level: 95 },
