@@ -173,7 +173,7 @@ export default function OnePagePortfolio() {
       className={`${themeClasses} min-h-screen font-sans scroll-smooth transition-colors duration-500 relative overflow-hidden`}
     >
       {/* Global image background */}
-      <div className="fixed inset-0 -z-20">
+      <div className="fixed inset-0 -z-10 pointer-events-none">
         <img
           src={
             darkMode
@@ -195,7 +195,7 @@ export default function OnePagePortfolio() {
       {/* Theme Toggle */}
       <button
         onClick={() => setDarkMode(!darkMode)}
-        className={`fixed top-6 right-6 z-50 p-3 rounded-full backdrop-blur-lg border transition ${
+        className={`fixed top-6 right-6 z-[60] p-3 rounded-full backdrop-blur-lg border transition ${
           darkMode
             ? "bg-white/10 border-white/20 hover:bg-white/20"
             : "bg-white/10 border-white/20 hover:bg-white/20"
@@ -206,29 +206,29 @@ export default function OnePagePortfolio() {
       </button>
 
       {/* Floating Nav */}
-<motion.div
-  initial={{ y: -80, opacity: 0 }}
-  animate={{ y: 0, opacity: 1 }}
-  className="fixed top-6 left-0 right-0 z-50 flex justify-center"
->
-  <div className="backdrop-blur-lg border border-white/20 bg-white/10 rounded-full px-6 py-3 flex gap-6 text-sm transition w-fit">
-    {navItems.map((item) => (
-      <a
-        key={item}
-        href={`#${item}`}
-        className={`capitalize transition px-3 py-1 rounded-full ${
-          activeSection === item
-            ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white"
-            : darkMode
-            ? "text-gray-300 hover:text-blue-400"
-            : "text-gray-800 hover:text-blue-500"
-        }`}
+      <motion.div
+        initial={{ y: -80, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        className="fixed top-6 left-0 right-0 z-50 flex justify-center pointer-events-none"
       >
-        {item}
-      </a>
-    ))}
-  </div>
-</motion.div>
+        <div className="backdrop-blur-lg border border-white/20 bg-white/10 rounded-full px-6 py-3 flex gap-6 text-sm transition mx-auto w-fit pointer-events-auto">
+          {navItems.map((item) => (
+            <a
+              key={item}
+              href={`#${item}`}
+              className={`capitalize transition px-3 py-1 rounded-full ${
+                activeSection === item
+                  ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white"
+                  : darkMode
+                  ? "text-gray-300 hover:text-blue-400"
+                  : "text-gray-800 hover:text-blue-500"
+              }`}
+            >
+              {item}
+            </a>
+          ))}
+        </div>
+      </motion.div>
 
       {/* HERO */}
       <section className="min-h-screen flex flex-col justify-center items-center text-center px-6">
