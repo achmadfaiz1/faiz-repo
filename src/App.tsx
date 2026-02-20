@@ -257,17 +257,23 @@ export default function OnePagePortfolio() {
 
       {/* Global image background */}
       <div className="fixed inset-0 -z-10 pointer-events-none">
-        <img
+        {/* Smooth crossfade background */}
+        <motion.img
+          key={darkMode ? "dark-bg" : "light-bg"}
           src={
             darkMode
               ? "https://res.cloudinary.com/dqszs1x5y/image/upload/v1771569212/luke-chesser-pJadQetzTkI-unsplash_emj3vm.jpg"
               : "https://res.cloudinary.com/dqszs1x5y/image/upload/v1771569209/codioful-formerly-gradienta-WwL5-EUXtDk-unsplash_ma2ll5.jpg"
           }
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6 }}
           alt="background"
-          className="w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-cover"
         />
+
         <div
-          className={`absolute inset-0 ${
+          className={`absolute inset-0 transition-colors duration-500 ${
             darkMode ? "bg-[#020617]/70" : "bg-white/60"
           }`}
         />
@@ -279,7 +285,14 @@ export default function OnePagePortfolio() {
         className="fixed top-6 right-6 z-[60] p-3 rounded-full backdrop-blur-lg border bg-white/10 border-white/20 hover:bg-white/20 transition"
         aria-label="Toggle theme"
       >
-        {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+        <motion.div
+          key={darkMode ? "sun" : "moon"}
+          initial={{ rotate: -90, opacity: 0 }}
+          animate={{ rotate: 0, opacity: 1 }}
+          transition={{ duration: 0.3 }}
+        >
+          {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+        </motion.div>
       </button>
 
       {/* Floating Nav (Desktop) */}
