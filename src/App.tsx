@@ -692,7 +692,7 @@ export default function OnePagePortfolio() {
           </a>
         </div>
 
-        {/* Resume Download Button (moved here) */}
+        {/* Resume Download Button */}
         <a
           href="/Achmad_Faiz_Resume.pdf"
           download
