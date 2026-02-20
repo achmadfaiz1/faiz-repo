@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 
 export default function OnePagePortfolio() {
+  const [scrollProgress, setScrollProgress] = useState(0);
   const [darkMode, setDarkMode] = useState(true);
   const [expanded, setExpanded] = useState<number | null>(null);
   const [activeSection, setActiveSection] = useState("about");
@@ -37,13 +38,25 @@ export default function OnePagePortfolio() {
   ];
 
   useEffect(() => {
+    const handleScrollProgress = () => {
+      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = (window.scrollY / totalHeight) * 100;
+      setScrollProgress(progress);
+    };
+
+    window.addEventListener("scroll", handleScrollProgress);
+    handleScrollProgress();
+
+    return () => window.removeEventListener("scroll", handleScrollProgress);
+  }, []);
+
+  useEffect(() => {
     const sections = document.querySelectorAll("section[id]");
 
     let ticking = false;
 
     const updateActiveSection = () => {
       const scrollPosition = window.scrollY + window.innerHeight / 3;
-
       let currentSection = "about";
 
       sections.forEach((section) => {
@@ -232,9 +245,15 @@ export default function OnePagePortfolio() {
   ];
 
   return (
-    <div
-      className={`${themeClasses} min-h-screen font-sans scroll-smooth transition-colors duration-500 relative overflow-hidden`}
-    >
+    <div className={`${themeClasses} min-h-screen font-sans scroll-smooth transition-colors duration-500 relative overflow-hidden`}>
+      {/* Scroll Progress Bar */}
+      <div className="fixed top-0 left-0 w-full h-[3px] bg-white/10 z-[100]">
+        <div
+          className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-200"
+          style={{ width: `${scrollProgress}%` }}
+        />
+      </div>
+
       {/* Global image background */}
       <div className="fixed inset-0 -z-10 pointer-events-none">
         <img
@@ -246,7 +265,6 @@ export default function OnePagePortfolio() {
           alt="background"
           className="w-full h-full object-cover"
         />
-
         <div
           className={`absolute inset-0 ${
             darkMode ? "bg-[#020617]/70" : "bg-white/60"
@@ -257,11 +275,7 @@ export default function OnePagePortfolio() {
       {/* Theme Toggle */}
       <button
         onClick={() => setDarkMode(!darkMode)}
-        className={`fixed top-6 right-6 z-[60] p-3 rounded-full backdrop-blur-lg border transition ${
-          darkMode
-            ? "bg-white/10 border-white/20 hover:bg-white/20"
-            : "bg-white/10 border-white/20 hover:bg-white/20"
-        }`}
+        className="fixed top-6 right-6 z-[60] p-3 rounded-full backdrop-blur-lg border bg-white/10 border-white/20 hover:bg-white/20 transition"
         aria-label="Toggle theme"
       >
         {darkMode ? <Sun size={18} /> : <Moon size={18} />}
@@ -292,35 +306,6 @@ export default function OnePagePortfolio() {
         </div>
       </motion.div>
 
-      {/* Mobile Burger Button */}
-      <button
-        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        className="sm:hidden fixed top-6 left-6 z-[60] p-3 rounded-full backdrop-blur-lg border bg-white/10 border-white/20"
-        aria-label="Toggle menu"
-      >
-        {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
-      </button>
-
-      {/* Mobile Menu Panel */}
-      {mobileMenuOpen && (
-        <div className="sm:hidden fixed top-20 left-6 right-6 z-[55] backdrop-blur-lg border border-white/20 bg-white/10 rounded-2xl p-4 flex flex-col gap-2">
-          {navItems.map((item) => (
-            <a
-              key={item}
-              href={`#${item}`}
-              onClick={() => setMobileMenuOpen(false)}
-              className={`capitalize px-3 py-2 rounded-lg transition ${
-                activeSection === item
-                  ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white"
-                  : mutedText
-              }`}
-            >
-              {item}
-            </a>
-          ))}
-        </div>
-      )}
-
       {/* HERO */}
       <section className="min-h-screen flex flex-col justify-center items-center text-center px-6">
         <motion.div
@@ -329,24 +314,16 @@ export default function OnePagePortfolio() {
           transition={{ duration: 0.8 }}
           className="flex flex-col items-center"
         >
-          {/* Profile Photo */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
-            className="mb-6"
-          >
-            <div className="w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 rounded-full p-[2px] bg-gradient-to-r from-blue-500 to-purple-500">
-              <div className="w-full h-full rounded-full overflow-hidden backdrop-blur-sm bg-white/10">
-                {/* Replace src with your photo later */}
-                <img
-                  src="https://res.cloudinary.com/dqszs1x5y/image/upload/v1771588295/WhatsApp_Image_2026-02-20_at_6.49.42_PM_nvzmpy.jpg"
-                  alt="Achmad Faiz"
-                  className="w-full h-full object-cover"
-                />
-              </div>
+          <div className="w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 rounded-full p-[2px] bg-gradient-to-r from-blue-500 to-purple-500 mb-6">
+            <div className="w-full h-full rounded-full overflow-hidden backdrop-blur-sm bg-white/10">
+              <img
+                src="https://res.cloudinary.com/dqszs1x5y/image/upload/v1771588295/WhatsApp_Image_2026-02-20_at_6.49.42_PM_nvzmpy.jpg"
+                alt="Achmad Faiz"
+                className="w-full h-full object-cover"
+              />
             </div>
-          </motion.div>
+          </div>
+
           <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold mb-4 leading-tight">
             Achmad Faiz
           </h1>
@@ -359,7 +336,41 @@ export default function OnePagePortfolio() {
           >
             Performance Management • Data Analyst • People Analytics • HR Strategy
           </motion.p>
+
+          <div className={`flex flex-wrap justify-center gap-3 mb-4 text-xs sm:text-sm ${mutedText}`}>
+            <span className="px-3 py-1 rounded-full border border-white/20 bg-white/5">5+ Years Experience</span>
+            <span className="px-3 py-1 rounded-full border border-white/20 bg-white/5">GoTo • Uber Alumni</span>
+            <span className="px-3 py-1 rounded-full border border-white/20 bg-white/5">People Analytics Specialist</span>
+          </div>
+
+          <div className="mb-4">
+            <span className="px-4 py-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs sm:text-sm font-medium">
+              Interest to Data Analyst • People Analytics in HR
+            </span>
+          </div>
+
+          
         </motion.div>
+      </section>
+
+      {/* KEY ACHIEVEMENTS */}
+      <section id="achievements" className="py-16 sm:py-24 px-4 sm:px-6 max-w-4xl mx-auto">
+        <h2 className="text-2xl sm:text-3xl font-bold mb-6">Key Achievements</h2>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {[
+            "Built inhouse HR Performance Management Tools in collaboration with the internal engineer team used by our Employee, HR, and Leaders for performance development and future decisions",
+            "Improved performance data visibility across multiple business units",
+            "Developed scalable analytics dashboard using BigQuery and SQL",
+            "Supported strategic people planning with data-driven insights",
+          ].map((item, i) => (
+            <div
+              key={i}
+              className={`${cardBaseClasses} border rounded-xl p-4 hover:border-blue-400 transition`}
+            >
+              {item}
+            </div>
+          ))}
+        </div>
       </section>
 
       {/* ABOUT */}
@@ -368,7 +379,7 @@ export default function OnePagePortfolio() {
         <p className={`text-base sm:text-lg leading-relaxed ${mutedText}`}>
           Hi, I’m Faiz. I’m a Performance Data Analyst at GoTo specializing in People Analytics and performance management systems. I turn workforce data into clear, actionable insights that help leaders make smarter talent decisions.
 
-I focus on performance trends, dashboard development, and building scalable systems that improve evaluation processes, transparency, and organizational growth.
+          I focus on performance trends, dashboard development, and building scalable systems that improve evaluation processes, transparency, and organizational growth.
         </p>
       </section>
 
@@ -376,7 +387,6 @@ I focus on performance trends, dashboard development, and building scalable syst
       <section id="skills" className="py-16 sm:py-24 px-4 sm:px-6 max-w-4xl mx-auto">
         <h2 className="text-2xl sm:text-3xl font-bold mb-8 sm:mb-10">Skills</h2>
 
-        {/* Tabs */}
         <div className="flex flex-wrap gap-2 mb-6">
           {skillCategories.map((category) => (
             <button
@@ -395,7 +405,6 @@ I focus on performance trends, dashboard development, and building scalable syst
           ))}
         </div>
 
-        {/* Tab Content */}
         <div className="space-y-6">
           {skillCategories
             .filter((cat) => cat.category === activeSkillTab)
@@ -412,7 +421,6 @@ I focus on performance trends, dashboard development, and building scalable syst
                       <span>{skill.name}</span>
                       <span>{skill.level}%</span>
                     </div>
-
                     <div
                       className={`w-full rounded-full h-3 overflow-hidden ${
                         darkMode ? "bg-gray-800" : "bg-gray-300"
@@ -469,7 +477,6 @@ I focus on performance trends, dashboard development, and building scalable syst
       {/* PROJECTS */}
       <section id="projects" className="py-16 sm:py-24 px-4 sm:px-6 max-w-4xl mx-auto">
         <h2 className="text-2xl sm:text-3xl font-bold mb-8 sm:mb-10">Projects</h2>
-
         <div className="space-y-6">
           {projects.map((project, index) => (
             <div
@@ -506,15 +513,12 @@ I focus on performance trends, dashboard development, and building scalable syst
       {/* EDUCATION */}
       <section id="education" className="py-16 sm:py-24 px-4 sm:px-6 max-w-4xl mx-auto">
         <h2 className="text-2xl sm:text-3xl font-bold mb-8 sm:mb-10">Education</h2>
-
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           className={`${cardBaseClasses} border p-4 sm:p-6 rounded-xl`}
         >
-          <h3 className="text-xl font-semibold">
-            Universitas Sumatera Utara
-          </h3>
+          <h3 className="text-xl font-semibold">Universitas Sumatera Utara</h3>
           <p className="text-blue-400">Diploma in Informatics Engineering</p>
           <p className="text-sm text-gray-400">2013 – 2016</p>
           <p className={`mt-2 ${mutedText}`}>GPA: 3.30</p>
@@ -524,24 +528,17 @@ I focus on performance trends, dashboard development, and building scalable syst
       {/* CERTIFICATIONS */}
       <section id="certifications" className="py-16 sm:py-24 px-4 sm:px-6 max-w-4xl mx-auto">
         <h2 className="text-2xl sm:text-3xl font-bold mb-8 sm:mb-10">Certifications</h2>
-
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
           className={`${cardBaseClasses} border p-4 sm:p-6 rounded-xl hover:border-purple-400 transition`}
         >
-          <h3 className="text-xl font-semibold">
-            BI-University Advanced Stream
-          </h3>
-
+          <h3 className="text-xl font-semibold">BI-University Advanced Stream</h3>
           <p className="text-purple-400">GoTo Group</p>
-
           <p className="text-sm text-gray-400">Issued August 2019</p>
-
           <p className={`mt-3 ${mutedText}`}>
-            Advanced Business Intelligence certification focused on data
-            analysis, SQL, dashboarding, and analytics best practices.
+            Advanced Business Intelligence certification focused on data analysis, SQL, dashboarding, and analytics best practices.
           </p>
         </motion.div>
       </section>
@@ -549,15 +546,10 @@ I focus on performance trends, dashboard development, and building scalable syst
       {/* CONTACT */}
       <section id="contact" className="py-24 px-6 text-center">
         <h2 className="text-3xl font-bold mb-6">Thank You • Let's Connect!</h2>
-
-        <div className="flex justify-center gap-4 sm:gap-6">
-          <a
-            href="mailto:achmad.f.faiz@gmail.com"
-            className="hover:text-blue-400"
-          >
+        <div className="flex justify-center gap-4 sm:gap-6 mb-6">
+          <a href="mailto:achmad.f.faiz@gmail.com" className="hover:text-blue-400">
             <Mail size={28} />
           </a>
-
           <a
             href="https://www.linkedin.com/in/achmadf18/"
             target="_blank"
@@ -567,7 +559,24 @@ I focus on performance trends, dashboard development, and building scalable syst
             <Linkedin size={28} />
           </a>
         </div>
+
+        {/* Resume Download Button (moved here) */}
+        <a
+          href="/Achmad_Faiz_Resume.pdf"
+          download
+          className="inline-block px-6 py-3 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-medium hover:scale-105 transition"
+        >
+          Download Resume
+        </a>
       </section>
+
+      {/* Back to Top Button */}
+      <button
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        className="fixed bottom-6 right-6 z-[60] px-4 py-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white text-sm hover:scale-110 transition"
+      >
+        ↑ Top
+      </button>
     </div>
   );
 }
