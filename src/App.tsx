@@ -14,6 +14,7 @@ export default function OnePagePortfolio() {
   const [expanded, setExpanded] = useState<number | null>(null);
   const [activeSection, setActiveSection] = useState("about");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeSkillTab, setActiveSkillTab] = useState("Core Skills");
 
   const themeClasses = darkMode
     ? "bg-transparent text-white"
@@ -77,12 +78,65 @@ export default function OnePagePortfolio() {
     };
   }, []);
 
-  const skills = [
-    { name: "People Analytics", level: 95 },
-    { name: "SQL & BigQuery", level: 92 },
-    { name: "Dashboard & Visualization", level: 90 },
-    { name: "Performance Management", level: 94 },
-    { name: "Talent Analytics", level: 88 },
+  const skillCategories = [
+    {
+      category: "Core Skills",
+      items: [
+        { name: "People Analytics", level: 95 },
+        { name: "SQL & BigQuery", level: 92 },
+        { name: "Dashboard & Visualization", level: 90 },
+        { name: "Performance Management", level: 94 },
+        { name: "Talent Analytics", level: 88 },
+      ],
+    },
+    {
+      category: "Data Analysis",
+      items: [
+        { name: "SQL Query", level: 95 },
+        { name: "PostgreSQL", level: 92 },
+        { name: "R Studio", level: 85 },
+        { name: "BigQuery", level: 95 },
+        { name: "DBeaver", level: 90 },
+        { name: "Google Sheets", level: 93 },
+        { name: "Looker", level: 88 },
+        { name: "Tableau", level: 85 },
+      ],
+    },
+    {
+      category: "Human Resource",
+      items: [
+        { name: "Performance and Talent Management", level: 95 },
+        { name: "Internal Communication", level: 90 },
+        { name: "HR Tools Development", level: 88 },
+      ],
+    },
+    {
+      category: "Language",
+      items: [
+        { name: "English", level: 90 },
+        { name: "Bahasa Indonesia", level: 100 },
+      ],
+    },
+    {
+      category: "Other Tools",
+      items: [
+        { name: "Figma", level: 80 },
+        { name: "MS Office", level: 92 },
+        { name: "Google Workspace", level: 95 },
+        { name: "Lever ATS", level: 85 },
+      ],
+    },
+    {
+      category: "Supporting Skills",
+      items: [
+        { name: "Project Management", level: 90 },
+        { name: "Stakeholder Management", level: 95 },
+        { name: "Product Management", level: 85 },
+        { name: "Researcher", level: 92 },
+        { name: "Usability Testing", level: 88 },
+        { name: "Working with team or Independent", level: 95 },
+      ],
+    },
   ];
 
   const experiences = [
@@ -318,36 +372,61 @@ export default function OnePagePortfolio() {
 
       {/* SKILLS */}
       <section id="skills" className="py-16 sm:py-24 px-4 sm:px-6 max-w-4xl mx-auto">
-        <h2 className="text-2xl sm:text-3xl font-bold mb-8 sm:mb-10">Core Skills</h2>
-        <div className="space-y-6">
-          {skills.map((skill, index) => (
-            <motion.div
-              key={skill.name}
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              whileHover={{ scale: 1.03 }}
-              transition={{ duration: 0.3, delay: index * 0.05 }}
-              className="group"
-            >
-              <div className="flex justify-between mb-1">
-                <span>{skill.name}</span>
-                <span>{skill.level}%</span>
-              </div>
+        <h2 className="text-2xl sm:text-3xl font-bold mb-8 sm:mb-10">Skills</h2>
 
-              <div
-                className={`w-full rounded-full h-3 overflow-hidden ${
-                  darkMode ? "bg-gray-800" : "bg-gray-300"
-                }`}
-              >
-                <motion.div
-                  initial={{ width: 0 }}
-                  whileInView={{ width: `${skill.level}%` }}
-                  transition={{ duration: 1, delay: index * 0.1 }}
-                  className="h-3 rounded-full bg-gradient-to-r from-blue-500 to-purple-500"
-                />
-              </div>
-            </motion.div>
+        {/* Tabs */}
+        <div className="flex flex-wrap gap-2 mb-6">
+          {skillCategories.map((category) => (
+            <button
+              key={category.category}
+              onClick={() => setActiveSkillTab(category.category)}
+              className={`px-4 py-2 rounded-full border text-sm transition ${
+                activeSkillTab === category.category
+                  ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white border-transparent"
+                  : darkMode
+                  ? "border-white/20 hover:border-blue-400 text-gray-300"
+                  : "border-gray-300 hover:border-blue-400 text-gray-700"
+              }`}
+            >
+              {category.category}
+            </button>
           ))}
+        </div>
+
+        {/* Tab Content */}
+        <div className="space-y-6">
+          {skillCategories
+            .filter((cat) => cat.category === activeSkillTab)
+            .map((category) => (
+              <div key={category.category} className="space-y-6">
+                {category.items.map((skill, index) => (
+                  <motion.div
+                    key={skill.name}
+                    initial={{ opacity: 0, x: -30 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.3, delay: index * 0.05 }}
+                  >
+                    <div className="flex justify-between mb-1">
+                      <span>{skill.name}</span>
+                      <span>{skill.level}%</span>
+                    </div>
+
+                    <div
+                      className={`w-full rounded-full h-3 overflow-hidden ${
+                        darkMode ? "bg-gray-800" : "bg-gray-300"
+                      }`}
+                    >
+                      <motion.div
+                        initial={{ width: 0 }}
+                        whileInView={{ width: `${skill.level}%` }}
+                        transition={{ duration: 1, delay: index * 0.1 }}
+                        className="h-3 rounded-full bg-gradient-to-r from-blue-500 to-purple-500"
+                      />
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            ))}
         </div>
       </section>
 
