@@ -399,7 +399,7 @@ export default function OnePagePortfolio() {
         <div className="grid gap-4 sm:grid-cols-2">
           {[
             "Built inhouse HR Performance Management Tools in collaboration with the internal engineer team used by our Employee, HR, and Leaders for performance development and future decisions",
-            "Improved performance data visibility across multiple business units, and developed scalable analytics report using BigQuery and SQL to support strategic people planning with data-driven insights",
+            "Improved performance data visibility across multiple business units, and Developed scalable analytics report using BigQuery and SQL to support strategic people planning with data-driven insights",
           ].map((item, i) => (
             <div
               key={i}
@@ -471,32 +471,42 @@ export default function OnePagePortfolio() {
       {/* EXPERIENCE */}
       <section id="experience" className="py-16 sm:py-24 px-4 sm:px-6 max-w-4xl mx-auto">
         <h2 className="text-2xl sm:text-3xl font-bold mb-8 sm:mb-10">Experience</h2>
-        <div className="space-y-6">
-          {experiences.map((exp, index) => (
-            <div
-              key={`${exp.company}-${exp.role}`}
-              onClick={() => setExpanded(expanded === index ? null : index)}
-              className={`border p-4 sm:p-6 rounded-xl transition cursor-pointer ${cardBaseClasses} ${
-                expanded === index
-                  ? "border-blue-400 shadow-lg shadow-blue-500/10 ring-1 ring-blue-400/40"
-                  : "hover:border-blue-400"
-              }`}
-            >
-              <h3 className="text-xl font-semibold">{exp.role}</h3>
-              <p className="text-blue-400">{exp.company}</p>
-              <p className="text-sm text-gray-400 mb-2">{exp.period}</p>
-              <p className={mutedText}>{exp.summary}</p>
 
-              {expanded === index && (
-                <ul className={`mt-4 space-y-2 ${mutedText}`}>
-                  {exp.bullets.map((bullet, bulletIndex) => (
-                    <li key={bulletIndex} className="flex gap-2 items-start">
-                      <span className="text-blue-400 mt-1">•</span>
-                      <span>{bullet}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
+        <div className="relative border-l border-white/20 ml-4 space-y-10">
+          {experiences.map((exp, index) => (
+            <div key={`${exp.company}-${exp.role}`} className="relative">
+              {/* timeline dot */}
+              <div className="absolute -left-[9px] top-2 w-4 h-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-500" />
+
+              {/* card */}
+              <div
+                onClick={() => setExpanded(expanded === index ? null : index)}
+                className={`ml-6 border p-4 sm:p-6 rounded-xl transition cursor-pointer ${cardBaseClasses} ${
+                  expanded === index
+                    ? "border-blue-400 shadow-lg shadow-blue-500/10 ring-1 ring-blue-400/40"
+                    : "hover:border-blue-400"
+                }`}
+              >
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-1">
+                  <h3 className="text-lg sm:text-xl font-semibold">{exp.role}</h3>
+                  <span className="text-xs sm:text-sm text-gray-400">{exp.period}</span>
+                </div>
+
+                <p className="text-blue-400 mb-2">{exp.company}</p>
+
+                <p className={mutedText}>{exp.summary}</p>
+
+                {expanded === index && (
+                  <ul className={`mt-4 space-y-2 ${mutedText}`}>
+                    {exp.bullets.map((bullet, bulletIndex) => (
+                      <li key={bulletIndex} className="flex gap-2 items-start">
+                        <span className="text-blue-400 mt-1">•</span>
+                        <span>{bullet}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             </div>
           ))}
         </div>
@@ -556,19 +566,113 @@ export default function OnePagePortfolio() {
       {/* CERTIFICATIONS */}
       <section id="certifications" className="py-16 sm:py-24 px-4 sm:px-6 max-w-4xl mx-auto">
         <h2 className="text-2xl sm:text-3xl font-bold mb-8 sm:mb-10">Certifications</h2>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className={`${cardBaseClasses} border p-4 sm:p-6 rounded-xl hover:border-purple-400 transition`}
-        >
-          <h3 className="text-xl font-semibold">BI-University Advanced Stream</h3>
-          <p className="text-purple-400">GoTo Group</p>
-          <p className="text-sm text-gray-400">Issued August 2019</p>
-          <p className={`mt-3 ${mutedText}`}>
-            Advanced Business Intelligence certification focused on data analysis, SQL, dashboarding, and analytics best practices.
-          </p>
-        </motion.div>
+
+        <div className="space-y-6">
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+            className={`${cardBaseClasses} border p-4 sm:p-6 rounded-xl hover:border-purple-400 transition`}
+          >
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+              {/* left content */}
+              <div className="flex-1">
+                <h3 className="text-xl font-semibold">The Project Management Course: Beginner to PROject Manager</h3>
+                <p className="text-purple-400">Udemy</p>
+                <p className="text-sm text-gray-400">Issued August 2025</p>
+
+                <p className={`mt-3 ${mutedText}`}>
+                  Certification covering project lifecycle, planning, execution, risk management, and stakeholder communication.
+                </p>
+
+                {/* credential link */}
+                <a
+                  href="https://www.udemy.com/certificate/UC-8f286218-177b-4f0f-9348-4009768a0ab0/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block mt-4 px-4 py-2 rounded-full border border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white transition text-sm"
+                >
+                  Show Credential ↗
+                </a>
+              </div>
+
+              {/* preview image */}
+              <a
+                href="https://www.udemy.com/certificate/UC-8f286218-177b-4f0f-9348-4009768a0ab0/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-40 h-28 rounded-lg overflow-hidden border border-white/20 hover:scale-105 transition"
+              >
+                <img
+                  src="https://udemy-certificate.s3.amazonaws.com/image/UC-8f286218-177b-4f0f-9348-4009768a0ab0.jpg?v=1756463361000"
+                  alt="Project Management Certificate Preview"
+                  className="w-full h-full object-cover"
+                />
+              </a>
+            </div>
+          </motion.div>
+
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+            className={`${cardBaseClasses} border p-4 sm:p-6 rounded-xl hover:border-purple-400 transition`}
+          >
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+              {/* left content */}
+              <div className="flex-1">
+                <h3 className="text-xl font-semibold">Global HR Management</h3>
+                <p className="text-purple-400">Udemy</p>
+                <p className="text-sm text-gray-400">Issued July 2025</p>
+
+                <p className={`mt-3 ${mutedText}`}>
+                  Certification covering Navigating International Talent Acquisition, Engagement, and Retention Strategies.
+                </p>
+
+                {/* credential link */}
+                <a
+                  href="https://www.udemy.com/certificate/UC-dd5c84ac-57a4-4f39-b9d8-84898d437ba5/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block mt-4 px-4 py-2 rounded-full border border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white transition text-sm"
+                >
+                  Show Credential ↗
+                </a>
+              </div>
+
+              {/* preview image */}
+              <a
+                href="https://www.udemy.com/certificate/UC-dd5c84ac-57a4-4f39-b9d8-84898d437ba5/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-40 h-28 rounded-lg overflow-hidden border border-white/20 hover:scale-105 transition"
+              >
+                <img
+                  src="https://udemy-certificate.s3.amazonaws.com/image/UC-dd5c84ac-57a4-4f39-b9d8-84898d437ba5.jpg?v=1751636526000"
+                  alt="Global HR Management Certificate Preview"
+                  className="w-full h-full object-cover"
+                />
+              </a>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className={`${cardBaseClasses} border p-4 sm:p-6 rounded-xl hover:border-purple-400 transition`}
+          >
+            <h3 className="text-xl font-semibold">BI-University Advanced Stream</h3>
+            <p className="text-purple-400">GoTo Group</p>
+            <p className="text-sm text-gray-400">Issued August 2019</p>
+            <p className={`mt-3 ${mutedText}`}>
+              Advanced Business Intelligence certification focused on data analysis, SQL, dashboarding, and analytics best practices.
+            </p>
+          </motion.div>
+          
+        </div>
       </section>
 
       {/* CONTACT */}
