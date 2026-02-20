@@ -383,15 +383,23 @@ export default function OnePagePortfolio() {
         </motion.div>
       </section>
 
+      {/* ABOUT */}
+      <section id="about" className="py-16 sm:py-24 px-4 sm:px-6 max-w-4xl mx-auto">
+        <h2 className="text-2xl sm:text-3xl font-bold mb-6">About Me (TL;DR)</h2>
+        <p className={`text-base sm:text-lg leading-relaxed ${mutedText}`}>
+          Hi, I’m Faiz. I’m a Performance Data Analyst at GoTo specializing in People Analytics and Performance Management Systems. I turn workforce data into clear, actionable insights that help leaders make smarter talent decisions.
+
+          I focus on performance trends, dashboard development, and building scalable systems that improve evaluation processes, transparency, and organizational growth.
+        </p>
+      </section>
+
       {/* KEY ACHIEVEMENTS */}
       <section id="achievements" className="py-12 sm:py-16 px-4 sm:px-6 max-w-4xl mx-auto">
         <h2 className="text-2xl sm:text-3xl font-bold mb-6">Key Achievements</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           {[
             "Built inhouse HR Performance Management Tools in collaboration with the internal engineer team used by our Employee, HR, and Leaders for performance development and future decisions",
-            "Improved performance data visibility across multiple business units",
-            "Developed scalable analytics dashboard using BigQuery and SQL",
-            "Supported strategic people planning with data-driven insights",
+            "Improved performance data visibility across multiple business units, and Developed scalable analytics report using BigQuery and SQL to support strategic people planning with data-driven insights",
           ].map((item, i) => (
             <div
               key={i}
@@ -401,16 +409,6 @@ export default function OnePagePortfolio() {
             </div>
           ))}
         </div>
-      </section>
-
-      {/* ABOUT */}
-      <section id="about" className="py-16 sm:py-24 px-4 sm:px-6 max-w-4xl mx-auto">
-        <h2 className="text-2xl sm:text-3xl font-bold mb-6">About Me (TL;DR)</h2>
-        <p className={`text-base sm:text-lg leading-relaxed ${mutedText}`}>
-          Hi, I’m Faiz. I’m a Performance Data Analyst at GoTo specializing in People Analytics and performance management systems. I turn workforce data into clear, actionable insights that help leaders make smarter talent decisions.
-
-          I focus on performance trends, dashboard development, and building scalable systems that improve evaluation processes, transparency, and organizational growth.
-        </p>
       </section>
 
       {/* SKILLS */}
@@ -577,7 +575,7 @@ export default function OnePagePortfolio() {
       <section id="contact" className="py-24 px-6 text-center">
         <h2 className="text-3xl font-bold mb-6">Thank You • Let's Connect!</h2>
         <div className="flex justify-center gap-4 sm:gap-6 mb-6">
-          <a href="mailto:achmad.f.faiz@gmail.com" className="hover:text-blue-400">
+          <a href="mailto:" className="hover:text-blue-400">
             <Mail size={28} />
           </a>
           <a
