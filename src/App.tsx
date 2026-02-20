@@ -220,7 +220,7 @@ export default function OnePagePortfolio() {
     {
       name: "PAC Data Warehouse Project",
       company: "GoTo HoldCo",
-      year: "2022",
+      year: "2020",
       summary:
         "Centralized HR data warehouse and enabled self-service analytics",
       bullets: [
