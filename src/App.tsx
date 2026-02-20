@@ -5,6 +5,8 @@ import {
   Linkedin,
   Sun,
   Moon,
+  Menu,
+  X,
 } from "lucide-react";
 
 export default function OnePagePortfolio() {
@@ -14,6 +16,7 @@ export default function OnePagePortfolio() {
   const [activeSection, setActiveSection] = useState("about");
   // mobileMenuOpen removed because mobile menu is not currently used
   const [activeSkillTab, setActiveSkillTab] = useState("Core Skills");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const themeClasses = darkMode
     ? "bg-transparent text-white"
@@ -279,7 +282,7 @@ export default function OnePagePortfolio() {
         {darkMode ? <Sun size={18} /> : <Moon size={18} />}
       </button>
 
-      {/* Floating Nav */}
+      {/* Floating Nav (Desktop) */}
       <motion.div
         initial={{ y: -80, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -303,6 +306,35 @@ export default function OnePagePortfolio() {
           ))}
         </div>
       </motion.div>
+
+      {/* Mobile Burger Button */}
+      <button
+        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        className="sm:hidden fixed top-6 left-6 z-[60] p-3 rounded-full backdrop-blur-lg border bg-white/10 border-white/20 hover:bg-white/20 transition"
+        aria-label="Toggle menu"
+      >
+        {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
+      </button>
+
+      {/* Mobile Menu Panel */}
+      {mobileMenuOpen && (
+        <div className="sm:hidden fixed top-20 left-6 right-6 z-[55] backdrop-blur-lg border border-white/20 bg-white/10 rounded-2xl p-4 flex flex-col gap-2">
+          {navItems.map((item) => (
+            <a
+              key={item}
+              href={`#${item}`}
+              onClick={() => setMobileMenuOpen(false)}
+              className={`capitalize px-3 py-2 rounded-lg transition ${
+                activeSection === item
+                  ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white"
+                  : mutedText
+              }`}
+            >
+              {item}
+            </a>
+          ))}
+        </div>
+      )}
 
       {/* HERO */}
       <section className="min-h-[85vh] flex flex-col justify-center items-center text-center px-6">
