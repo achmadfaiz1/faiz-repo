@@ -86,7 +86,7 @@ export default function OnePagePortfolio() {
         { name: "SQL & BigQuery", level: 92 },
         { name: "Dashboard & Visualization", level: 90 },
         { name: "Performance Management", level: 94 },
-        { name: "Talent Analytics", level: 88 },
+        { name: "Talent Acquisition Analytics", level: 88 },
       ],
     },
     {
@@ -98,14 +98,15 @@ export default function OnePagePortfolio() {
         { name: "BigQuery", level: 95 },
         { name: "DBeaver", level: 90 },
         { name: "Google Sheets", level: 93 },
-        { name: "Looker", level: 88 },
-        { name: "Tableau", level: 85 },
+        { name: "Looker", level: 90 },
+        { name: "Tableau", level: 80 },
       ],
     },
     {
       category: "Human Resource",
       items: [
         { name: "Performance and Talent Management", level: 95 },
+        { name: "Talent Acquisition", level: 85 },
         { name: "Internal Communication", level: 90 },
         { name: "HR Tools Development", level: 88 },
       ],
@@ -356,17 +357,18 @@ export default function OnePagePortfolio() {
             transition={{ delay: 0.3 }}
             className={`text-base sm:text-xl mb-6 ${mutedText}`}
           >
-            Performance Data Analyst • People Analytics • HR Strategy
+            Performance Management • Data Analyst • People Analytics • HR Strategy
           </motion.p>
         </motion.div>
       </section>
 
       {/* ABOUT */}
       <section id="about" className="py-16 sm:py-24 px-4 sm:px-6 max-w-4xl mx-auto">
-        <h2 className="text-2xl sm:text-3xl font-bold mb-6">About Me</h2>
+        <h2 className="text-2xl sm:text-3xl font-bold mb-6">About Me (TL;DR)</h2>
         <p className={`text-base sm:text-lg leading-relaxed ${mutedText}`}>
-          I am a Performance Data Analyst at GoTo specializing in People
-          Analytics, workforce insights, and performance management systems.
+          Hi, I’m Faiz. I’m a Performance Data Analyst at GoTo specializing in People Analytics and performance management systems. I turn workforce data into clear, actionable insights that help leaders make smarter talent decisions.
+
+I focus on performance trends, dashboard development, and building scalable systems that improve evaluation processes, transparency, and organizational growth.
         </p>
       </section>
 
@@ -546,7 +548,7 @@ export default function OnePagePortfolio() {
 
       {/* CONTACT */}
       <section id="contact" className="py-24 px-6 text-center">
-        <h2 className="text-3xl font-bold mb-6">Let’s Work Together</h2>
+        <h2 className="text-3xl font-bold mb-6">Thank You • Let's Connect!</h2>
 
         <div className="flex justify-center gap-4 sm:gap-6">
           <a
@@ -557,7 +559,7 @@ export default function OnePagePortfolio() {
           </a>
 
           <a
-            href="https://linkedin.com/in/achmadffaiz"
+            href="https://www.linkedin.com/in/achmadf18/"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-blue-400"
