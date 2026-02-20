@@ -45,10 +45,6 @@ export default function OnePagePortfolio() {
     window.addEventListener("scroll", handleScrollProgress);
     handleScrollProgress();
 
-    useEffect(() => {
-      document.title = "Achmad Faiz - Portfolio";
-    }, []);
-
     return () => window.removeEventListener("scroll", handleScrollProgress);
   }, []);
 
