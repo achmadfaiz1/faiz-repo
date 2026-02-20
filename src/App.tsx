@@ -387,7 +387,7 @@ export default function OnePagePortfolio() {
       <section id="about" className="py-16 sm:py-24 px-4 sm:px-6 max-w-4xl mx-auto">
         <h2 className="text-2xl sm:text-3xl font-bold mb-6">About Me (TL;DR)</h2>
         <p className={`text-base sm:text-lg leading-relaxed ${mutedText}`}>
-          Hi, I’m Faiz. I’m a Performance Data Analyst at GoTo specializing in People Analytics and Performance Management Systems. I turn workforce data into clear, actionable insights that help leaders make smarter talent decisions.
+          Hi, I’m Faiz. I’m a Performance Data Analyst at GoTo specializing in People Analytics and Performance Management Systems. I turn people data into clear, actionable insights that help PAC and leaders make smoother decisions in the future.
 
           I focus on performance trends, dashboard development, and building scalable systems that improve evaluation processes, transparency, and organizational growth.
         </p>
