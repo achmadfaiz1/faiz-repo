@@ -305,7 +305,7 @@ export default function OnePagePortfolio() {
       </motion.div>
 
       {/* HERO */}
-      <section className="min-h-screen flex flex-col justify-center items-center text-center px-6">
+      <section className="min-h-[85vh] flex flex-col justify-center items-center text-center px-6">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
@@ -352,7 +352,7 @@ export default function OnePagePortfolio() {
       </section>
 
       {/* KEY ACHIEVEMENTS */}
-      <section id="achievements" className="py-16 sm:py-24 px-4 sm:px-6 max-w-4xl mx-auto">
+      <section id="achievements" className="py-12 sm:py-16 px-4 sm:px-6 max-w-4xl mx-auto">
         <h2 className="text-2xl sm:text-3xl font-bold mb-6">Key Achievements</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           {[
