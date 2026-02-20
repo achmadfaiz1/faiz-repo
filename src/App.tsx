@@ -5,8 +5,6 @@ import {
   Linkedin,
   Sun,
   Moon,
-  Menu,
-  X,
 } from "lucide-react";
 
 export default function OnePagePortfolio() {
@@ -14,7 +12,7 @@ export default function OnePagePortfolio() {
   const [darkMode, setDarkMode] = useState(true);
   const [expanded, setExpanded] = useState<number | null>(null);
   const [activeSection, setActiveSection] = useState("about");
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  // mobileMenuOpen removed because mobile menu is not currently used
   const [activeSkillTab, setActiveSkillTab] = useState("Core Skills");
 
   const themeClasses = darkMode
