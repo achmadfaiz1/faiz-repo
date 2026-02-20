@@ -1,6 +1,13 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Mail, Linkedin, Sun, Moon, Menu, X } from "lucide-react";
+import {
+  Mail,
+  Linkedin,
+  Sun,
+  Moon,
+  Menu,
+  X,
+} from "lucide-react";
 
 export default function OnePagePortfolio() {
   const [darkMode, setDarkMode] = useState(true);
@@ -265,7 +272,26 @@ export default function OnePagePortfolio() {
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
+          className="flex flex-col items-center"
         >
+          {/* Profile Photo */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+            className="mb-6"
+          >
+            <div className="w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 rounded-full p-[2px] bg-gradient-to-r from-blue-500 to-purple-500">
+              <div className="w-full h-full rounded-full overflow-hidden backdrop-blur-sm bg-white/10">
+                {/* Replace src with your photo later */}
+                <img
+                  src="https://res.cloudinary.com/dqszs1x5y/image/upload/v1771588295/WhatsApp_Image_2026-02-20_at_6.49.42_PM_nvzmpy.jpg"
+                  alt="Achmad Faiz"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+          </motion.div>
           <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold mb-4 leading-tight">
             Achmad Faiz
           </h1>
