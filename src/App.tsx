@@ -206,29 +206,29 @@ export default function OnePagePortfolio() {
       </button>
 
       {/* Floating Nav */}
-      <motion.div
-        initial={{ y: -80, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        className="fixed top-6 left-1/2 -translate-x-1/2 z-50"
+<motion.div
+  initial={{ y: -80, opacity: 0 }}
+  animate={{ y: 0, opacity: 1 }}
+  className="fixed top-6 left-0 right-0 z-50 flex justify-center"
+>
+  <div className="backdrop-blur-lg border border-white/20 bg-white/10 rounded-full px-6 py-3 flex gap-6 text-sm transition w-fit">
+    {navItems.map((item) => (
+      <a
+        key={item}
+        href={`#${item}`}
+        className={`capitalize transition px-3 py-1 rounded-full ${
+          activeSection === item
+            ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white"
+            : darkMode
+            ? "text-gray-300 hover:text-blue-400"
+            : "text-gray-800 hover:text-blue-500"
+        }`}
       >
-        <div className="backdrop-blur-lg border border-white/20 bg-white/10 rounded-full px-6 py-3 flex gap-6 text-sm transition mx-auto w-fit">
-          {navItems.map((item) => (
-            <a
-              key={item}
-              href={`#${item}`}
-              className={`capitalize transition px-3 py-1 rounded-full ${
-                activeSection === item
-                  ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white"
-                  : darkMode
-                  ? "text-gray-300 hover:text-blue-400"
-                  : "text-gray-800 hover:text-blue-500"
-              }`}
-            >
-              {item}
-            </a>
-          ))}
-        </div>
-      </motion.div>
+        {item}
+      </a>
+    ))}
+  </div>
+</motion.div>
 
       {/* HERO */}
       <section className="min-h-screen flex flex-col justify-center items-center text-center px-6">
