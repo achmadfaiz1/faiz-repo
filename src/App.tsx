@@ -444,7 +444,7 @@ export default function ImprovedPortfolio() {
             transition={{ delay: 0.4 }}
             className="flex flex-wrap justify-center gap-3 mb-12"
           >
-            {["SQL", "BigQuery", "Tableau", "HR Strategy", "Python"].map((tag) => (
+            {["SQL", "BigQuery", "Tableau", "HR Strategy", "R Studio", "Performance Management"].map((tag) => (
               <span key={tag} className={`px-4 py-2 rounded-full text-sm font-medium border ${
                 darkMode ? "bg-white/5 border-white/10" : "bg-white border-gray-200"
               }`}>
@@ -728,7 +728,7 @@ export default function ImprovedPortfolio() {
               
               <div className="flex flex-col sm:flex-row justify-center gap-4">
                 <a
-                  href="mailto:achmad.faiz@example.com"
+                  href="mailto:"
                   className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-white text-black font-bold hover:bg-gray-100 transition-colors"
                 >
                   <Mail size={20} />
