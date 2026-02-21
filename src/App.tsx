@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Mail,
   Linkedin,
@@ -7,92 +7,92 @@ import {
   Moon,
   Menu,
   X,
+  ChevronDown,
+  ExternalLink,
+  Briefcase,
+  GraduationCap,
+  Code,
+  User,
+  FileBadge,
+  ArrowUp
 } from "lucide-react";
 
-export default function OnePagePortfolio() {
+// --- Types ---
+interface Skill {
+  name: string;
+  level: number;
+}
+
+interface SkillCategory {
+  category: string;
+  items: Skill[];
+}
+
+interface ExperienceItem {
+  role: string;
+  company: string;
+  period: string;
+  summary: string;
+  bullets: string[];
+}
+
+interface ProjectItem {
+  name: string;
+  company: string;
+  year: string;
+  summary: string;
+  bullets: string[];
+}
+
+interface CertificationItem {
+  title: string;
+  issuer: string;
+  date: string;
+  description: string;
+  link?: string;
+  image?: string;
+}
+
+// --- Components ---
+
+const SectionHeading = ({ children, darkMode }: { children: React.ReactNode; darkMode: boolean }) => (
+  <motion.h2
+    initial={{ opacity: 0, y: 20 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true }}
+    className={`text-3xl md:text-4xl font-bold mb-12 text-center ${darkMode ? "text-white" : "text-gray-900"}`}
+  >
+    {children}
+    <div className="w-16 h-1 bg-gradient-to-r from-[#0A4D68] to-[#06B6D4] mx-auto mt-4 rounded-full" />
+  </motion.h2>
+);
+
+export default function ImprovedPortfolio() {
+  // --- State ---
   const [scrollProgress, setScrollProgress] = useState(0);
   const [darkMode, setDarkMode] = useState(true);
-  const [expanded, setExpanded] = useState<number | null>(null);
   const [activeSection, setActiveSection] = useState("about");
-  // mobileMenuOpen removed because mobile menu is not currently used
-  const [activeSkillTab, setActiveSkillTab] = useState("Core Skills");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeSkillTab, setActiveSkillTab] = useState("Core Skills");
+  const [showBackToTop, setShowBackToTop] = useState(false);
+  
+  // Separate expanded states to avoid index collision bugs
+  const [expandedExp, setExpandedExp] = useState<number | null>(null);
+  const [expandedProj, setExpandedProj] = useState<number | null>(null);
+  const [expandedCert, setExpandedCert] = useState<number | null>(null);
 
-  const themeClasses = darkMode
-    ? "bg-transparent text-white"
-    : "bg-transparent text-gray-900";
-
-  const cardBaseClasses = darkMode
-    ? "bg-white/5 border-white/10"
-    : "bg-white/90 border-gray-200 shadow-sm backdrop-blur-sm";
-
-  const mutedText = darkMode ? "text-gray-300" : "text-gray-700";
-
+  // --- Data ---
   const navItems = [
-    "about",
-    "skills",
-    "experience",
-    "projects",
-    "education",
-    "certifications",
-    "contact",
+    { id: "about", label: "About", icon: User },
+    { id: "skills", label: "Skills", icon: Code },
+    { id: "experience", label: "Experience", icon: Briefcase },
+    { id: "projects", label: "Projects", icon: ExternalLink },
+    { id: "education", label: "Education", icon: GraduationCap },
+    { id: "certifications", label: "Certs", icon: FileBadge },
+    { id: "contact", label: "Contact", icon: Mail },
   ];
 
-  useEffect(() => {
-    const handleScrollProgress = () => {
-      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = (window.scrollY / totalHeight) * 100;
-      setScrollProgress(progress);
-    };
-
-    window.addEventListener("scroll", handleScrollProgress);
-    handleScrollProgress();
-
-    return () => window.removeEventListener("scroll", handleScrollProgress);
-  }, []);
-
-  useEffect(() => {
-    const sections = document.querySelectorAll("section[id]");
-
-    let ticking = false;
-
-    const updateActiveSection = () => {
-      const scrollPosition = window.scrollY + window.innerHeight / 3;
-      let currentSection = "about";
-
-      sections.forEach((section) => {
-        const element = section as HTMLElement;
-        const offsetTop = element.offsetTop;
-        const offsetHeight = element.offsetHeight;
-
-        if (
-          scrollPosition >= offsetTop &&
-          scrollPosition < offsetTop + offsetHeight
-        ) {
-          currentSection = element.id;
-        }
-      });
-
-      setActiveSection(currentSection);
-      ticking = false;
-    };
-
-    const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(updateActiveSection);
-        ticking = true;
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    updateActiveSection();
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
-  const skillCategories = [
+  const skillCategories: SkillCategory[] = [
     {
       category: "Core Skills",
       items: [
@@ -100,67 +100,42 @@ export default function OnePagePortfolio() {
         { name: "SQL & BigQuery", level: 92 },
         { name: "Dashboard & Visualization", level: 90 },
         { name: "Performance Management", level: 94 },
-        { name: "Talent Acquisition Analytics", level: 88 },
       ],
     },
     {
       category: "Data Analysis",
       items: [
-        { name: "SQL Query", level: 95 },
+        { name: "SQL Query Optimization", level: 95 },
         { name: "PostgreSQL", level: 92 },
         { name: "R Studio", level: 85 },
         { name: "BigQuery", level: 95 },
-        { name: "DBeaver", level: 90 },
-        { name: "Google Sheets", level: 93 },
-        { name: "Looker", level: 90 },
-        { name: "Tableau", level: 80 },
+        { name: "Tableau / Looker", level: 88 },
       ],
     },
     {
       category: "Human Resource",
       items: [
-        { name: "Performance and Talent Management", level: 95 },
+        { name: "Talent Management", level: 95 },
         { name: "Talent Acquisition", level: 85 },
-        { name: "Internal Communication", level: 90 },
         { name: "HR Tools Development", level: 88 },
       ],
     },
     {
-      category: "Language",
+      category: "Languages",
       items: [
-        { name: "English", level: 90 },
-        { name: "Bahasa Indonesia", level: 100 },
-      ],
-    },
-    {
-      category: "Other Tools",
-      items: [
-        { name: "Figma", level: 80 },
-        { name: "MS Office", level: 92 },
-        { name: "Google Workspace", level: 95 },
-        { name: "Lever ATS", level: 85 },
-      ],
-    },
-    {
-      category: "Supporting Skills",
-      items: [
-        { name: "Project Management", level: 90 },
-        { name: "Stakeholder Management", level: 95 },
-        { name: "Project Management", level: 85 },
-        { name: "Researcher", level: 92 },
-        { name: "Usability Testing", level: 88 },
-        { name: "Working with team or Independent", level: 95 },
+        { name: "English (Professional)", level: 90 },
+        { name: "Bahasa Indonesia (Native)", level: 100 },
       ],
     },
   ];
 
-  const experiences = [
+  // ALL EXPERIENCES RESTORED
+  const experiences: ExperienceItem[] = [
     {
       role: "Performance Data Analyst",
       company: "GoTo",
       period: "January 2020 – Present",
-      summary:
-        "Performance analytics, calibration insights, and HR dashboard development",
+      summary: "Performance analytics, calibration insights, and HR dashboard development",
       bullets: [
         "Delivered performance insights and calibration analysis for HR leaders.",
         "Developed dashboards and trackers using BigQuery and PostgreSQL.",
@@ -216,13 +191,12 @@ export default function OnePagePortfolio() {
     },
   ];
 
-  const projects = [
+  const projects: ProjectItem[] = [
     {
       name: "PAC Data Warehouse Project",
       company: "GoTo HoldCo",
       year: "2020",
-      summary:
-        "Centralized HR data warehouse and enabled self-service analytics",
+      summary: "Centralized HR data warehouse and enabled self-service analytics",
       bullets: [
         "Collaborated with People Analytics team to consolidate HR data into centralized BigQuery warehouse.",
         "Ensured data sources were accurately recorded and consistently updated.",
@@ -234,8 +208,7 @@ export default function OnePagePortfolio() {
       name: "Merchant Acquisition and Fraud Transaction Analysis",
       company: "GoTo GoPay",
       year: "2019",
-      summary:
-        "Fraud detection analysis and merchant transaction validation",
+      summary: "Fraud detection analysis and merchant transaction validation",
       bullets: [
         "Defined fraud detection metrics to evaluate merchant behavior across lifecycle.",
         "Identified suspicious transaction patterns and abnormal merchant activity.",
@@ -245,259 +218,355 @@ export default function OnePagePortfolio() {
     },
   ];
 
+  const certifications: CertificationItem[] = [
+    {
+      title: "The Project Management Course: Beginner to PROject Manager",
+      issuer: "Udemy",
+      date: "August 2025",
+      description: "Certification covering project lifecycle, planning, execution, risk management, and stakeholder communication.",
+      link: "https://www.udemy.com/certificate/UC-8f286218-177b-4f0f-9348-4009768a0ab0/",
+      image: "https://udemy-certificate.s3.amazonaws.com/image/UC-8f286218-177b-4f0f-9348-4009768a0ab0.jpg?v=1756463361000"
+    },
+    {
+      title: "Global HR Management",
+      issuer: "Udemy",
+      date: "July 2025",
+      description: "Certification covering Navigating International Talent Acquisition, Engagement, and Retention Strategies.",
+      link: "https://www.udemy.com/certificate/UC-dd5c84ac-57a4-4f39-b9d8-84898d437ba5/",
+      image: "https://udemy-certificate.s3.amazonaws.com/image/UC-dd5c84ac-57a4-4f39-b9d8-84898d437ba5.jpg?v=1751636526000"
+    },
+    {
+      title: "BI-University Advanced Stream",
+      issuer: "GoTo Group",
+      date: "August 2019",
+      description: "Advanced Business Intelligence certification focused on data analysis, SQL, dashboarding, and analytics best practices.",
+    }
+  ];
+
+  // --- Effects ---
+  useEffect(() => {
+    const handleScroll = () => {
+      // Progress Bar
+      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = (window.scrollY / totalHeight) * 100;
+      setScrollProgress(progress);
+
+      // Show/hide back to top button
+      setShowBackToTop(window.scrollY > 500);
+
+      // Active Section Detection
+      const sections = document.querySelectorAll("section");
+      const scrollPosition = window.scrollY + 150; // Offset for sticky header
+
+      sections.forEach((section) => {
+        const element = section as HTMLElement;
+        if (
+          scrollPosition >= element.offsetTop &&
+          scrollPosition < element.offsetTop + element.offsetHeight
+        ) {
+          setActiveSection(element.id);
+        }
+      });
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  // --- Styles ---
+  const themeClasses = darkMode ? "bg-[#0a0a0a] text-white" : "bg-[#f8f9fa] text-gray-900";
+  const cardBaseClasses = darkMode
+    ? "bg-[#111] border border-white/10 hover:border-[#06B6D4]/50"
+    : "bg-white border border-gray-200 shadow-sm hover:border-[#0A4D68]";
+  const mutedText = darkMode ? "text-gray-400" : "text-gray-600";
+  const gradientText = "bg-clip-text text-transparent bg-gradient-to-r from-[#0A4D68] to-[#06B6D4]";
+
+  // Deep Sea Blue: #0A4D68
+  // Sky Blue: #06B6D4
+
   return (
-    <div className={`${themeClasses} min-h-screen font-sans scroll-smooth transition-colors duration-500 relative overflow-hidden`}>
-      {/* Scroll Progress Bar */}
-      <div className="fixed top-0 left-0 w-full h-[3px] bg-white/10 z-[100]">
-        <div
-          className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-200"
+    <div className={`${themeClasses} min-h-screen font-sans selection:bg-[#0A4D68] selection:text-white transition-colors duration-500`}>
+      
+      {/* Progress Bar */}
+      <div className="fixed top-0 left-0 w-full h-1 bg-gray-200/10 z-[100]">
+        <motion.div
+          className="h-full bg-gradient-to-r from-[#0A4D68] to-[#06B6D4]"
           style={{ width: `${scrollProgress}%` }}
         />
       </div>
 
-      {/* Global image background */}
-      <div className="fixed inset-0 -z-10 pointer-events-none">
-        {/* Smooth crossfade background */}
-        <motion.img
-          key={darkMode ? "dark-bg" : "light-bg"}
-          src={
-            darkMode
-              ? "https://res.cloudinary.com/dqszs1x5y/image/upload/v1771569212/luke-chesser-pJadQetzTkI-unsplash_emj3vm.jpg"
-              : "https://res.cloudinary.com/dqszs1x5y/image/upload/v1771569209/codioful-formerly-gradienta-WwL5-EUXtDk-unsplash_ma2ll5.jpg"
-          }
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6 }}
-          alt="background"
-          className="absolute inset-0 w-full h-full object-cover"
-        />
+      {/* Navigation */}
+      <motion.nav
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        className={`fixed top-4 left-0 right-0 z-50 flex justify-center px-4`}
+      >
+        <div className={`hidden md:flex items-center gap-1 p-1.5 rounded-full border backdrop-blur-md ${
+          darkMode ? "bg-black/40 border-white/10" : "bg-white/60 border-gray-200"
+        }`}>
+          {navItems.map((item) => (
+            <a
+              key={item.id}
+              href={`#${item.id}`}
+              className={`relative px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+                activeSection === item.id
+                  ? "text-white"
+                  : darkMode ? "text-gray-400 hover:text-white" : "text-gray-600 hover:text-black"
+              }`}
+            >
+              {activeSection === item.id && (
+                <motion.div
+                  layoutId="activeNav"
+                  className="absolute inset-0 bg-gradient-to-r from-[#0A4D68] to-[#06B6D4] rounded-full"
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                />
+              )}
+              <span className="relative z-10 flex items-center gap-2">
+                <item.icon size={14} />
+                {item.label}
+              </span>
+            </a>
+          ))}
+        </div>
 
-        <div
-          className={`absolute inset-0 transition-colors duration-500 ${
-            darkMode ? "bg-[#020617]/70" : "bg-white/60"
-          }`}
-        />
-      </div>
+        {/* Mobile Menu Toggle */}
+        <div className="md:hidden fixed top-4 right-4 z-50">
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className={`p-3 rounded-full backdrop-blur-md border ${
+              darkMode ? "bg-black/50 border-white/10" : "bg-white/80 border-gray-200"
+            }`}
+          >
+            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
+      </motion.nav>
+
+      {/* Mobile Menu Overlay */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className={`fixed inset-0 z-40 md:hidden flex flex-col items-center justify-center gap-6 ${
+              darkMode ? "bg-black/95" : "bg-white/95"
+            } backdrop-blur-xl`}
+          >
+            {navItems.map((item) => (
+              <a
+                key={item.id}
+                href={`#${item.id}`}
+                onClick={() => setMobileMenuOpen(false)}
+                className={`text-2xl font-bold ${activeSection === item.id ? gradientText : ""}`}
+              >
+                {item.label}
+              </a>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Theme Toggle */}
       <button
         onClick={() => setDarkMode(!darkMode)}
-        className="fixed top-6 right-6 z-[60] p-3 rounded-full backdrop-blur-lg border bg-white/10 border-white/20 hover:bg-white/20 transition"
-        aria-label="Toggle theme"
+        className={`fixed bottom-6 right-6 z-50 p-3 rounded-full backdrop-blur-md border transition-all hover:scale-110 ${
+          darkMode ? "bg-white/10 border-white/20 text-[#06B6D4]" : "bg-white border-gray-200 text-[#0A4D68] shadow-lg"
+        }`}
       >
-        <motion.div
-          key={darkMode ? "sun" : "moon"}
-          initial={{ rotate: -90, opacity: 0 }}
-          animate={{ rotate: 0, opacity: 1 }}
-          transition={{ duration: 0.3 }}
-        >
-          {darkMode ? <Sun size={18} /> : <Moon size={18} />}
-        </motion.div>
+        {darkMode ? <Sun size={20} /> : <Moon size={20} />}
       </button>
 
-      {/* Floating Nav (Desktop) */}
-      <motion.div
-        initial={{ y: -80, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        className="fixed top-6 left-0 right-0 z-50 hidden sm:flex justify-center pointer-events-none"
-      >
-        <div className="backdrop-blur-lg border border-white/20 bg-white/10 rounded-full px-3 sm:px-6 py-2 sm:py-3 flex gap-3 sm:gap-6 text-xs sm:text-sm transition mx-auto w-fit pointer-events-auto">
-          {navItems.map((item) => (
-            <a
-              key={item}
-              href={`#${item}`}
-              className={`capitalize transition px-3 py-1 rounded-full ${
-                activeSection === item
-                  ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white"
-                  : darkMode
-                  ? "text-gray-300 hover:text-blue-400"
-                  : "text-gray-800 hover:text-blue-500"
-              }`}
-            >
-              {item}
-            </a>
-          ))}
+      {/* Back to Top Button */}
+      <AnimatePresence>
+        {showBackToTop && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            onClick={scrollToTop}
+            className={`fixed bottom-20 right-6 z-50 p-3 rounded-full backdrop-blur-md border transition-all hover:scale-110 ${
+              darkMode 
+                ? "bg-gradient-to-r from-[#0A4D68] to-[#06B6D4] border-transparent text-white shadow-lg shadow-[#06B6D4]/25" 
+                : "bg-gradient-to-r from-[#0A4D68] to-[#06B6D4] border-transparent text-white shadow-lg"
+            }`}
+            aria-label="Back to top"
+          >
+            <ArrowUp size={20} />
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+      {/* Hero Section */}
+      <section id="about" className="min-h-screen flex items-center justify-center relative px-6 pt-20">
+        {/* Background Elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className={`absolute top-1/4 left-1/4 w-96 h-96 rounded-full blur-[120px] opacity-20 ${
+            darkMode ? "bg-[#0A4D68]" : "bg-[#0A4D68]"
+          }`} />
+          <div className={`absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full blur-[120px] opacity-20 ${
+            darkMode ? "bg-[#06B6D4]" : "bg-[#06B6D4]"
+          }`} />
         </div>
-      </motion.div>
 
-      {/* Mobile Burger Button */}
-      <button
-        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        className="sm:hidden fixed top-6 left-6 z-[60] p-3 rounded-full backdrop-blur-lg border bg-white/10 border-white/20 hover:bg-white/20 transition"
-        aria-label="Toggle menu"
-      >
-        {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
-      </button>
-
-      {/* Mobile Menu Panel */}
-      {mobileMenuOpen && (
-        <div className="sm:hidden fixed top-20 left-6 right-6 z-[55] backdrop-blur-lg border border-white/20 bg-white/10 rounded-2xl p-4 flex flex-col gap-2">
-          {navItems.map((item) => (
-            <a
-              key={item}
-              href={`#${item}`}
-              onClick={() => setMobileMenuOpen(false)}
-              className={`capitalize px-3 py-2 rounded-lg transition ${
-                activeSection === item
-                  ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white"
-                  : mutedText
-              }`}
-            >
-              {item}
-            </a>
-          ))}
-        </div>
-      )}
-
-      {/* HERO */}
-      <section className="min-h-[85vh] flex flex-col justify-center items-center text-center px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="flex flex-col items-center"
-        >
-          <div className="w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 rounded-full p-[2px] bg-gradient-to-r from-blue-500 to-purple-500 mb-6">
-            <div className="w-full h-full rounded-full overflow-hidden backdrop-blur-sm bg-white/10">
+        <div className="max-w-4xl mx-auto text-center relative z-10">
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.8 }}
+            className="mb-8 relative inline-block"
+          >
+            <div className="w-32 h-32 md:w-40 md:h-40 rounded-full p-1 bg-gradient-to-tr from-[#0A4D68] to-[#06B6D4]">
               <img
                 src="https://res.cloudinary.com/dqszs1x5y/image/upload/v1771588295/WhatsApp_Image_2026-02-20_at_6.49.42_PM_nvzmpy.jpg"
                 alt="Achmad Faiz"
-                className="w-full h-full object-cover"
+                className="w-full h-full rounded-full object-cover border-4 border-black"
               />
             </div>
-          </div>
+          </motion.div>
 
-          <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold mb-4 leading-tight">
-            Achmad Faiz
-          </h1>
+          <motion.h1
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="text-5xl md:text-7xl font-bold mb-6 tracking-tight"
+          >
+            Achmad <span className={gradientText}>Faiz</span>
+          </motion.h1>
 
           <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.3 }}
-            className={`text-base sm:text-xl mb-6 ${mutedText}`}
+            className={`text-xl md:text-2xl mb-8 ${mutedText}`}
           >
-            Performance Management • Data Analyst • People Analytics • HR Strategy
+            Performance Data Analyst & People Analytics Specialist
           </motion.p>
 
-          <div className={`flex flex-wrap justify-center gap-3 mb-4 text-xs sm:text-sm ${mutedText}`}>
-            <span className="px-3 py-1 rounded-full border border-white/20 bg-white/5">5+ Years Experience</span>
-            <span className="px-3 py-1 rounded-full border border-white/20 bg-white/5">GoTo • Uber Alumni</span>
-            <span className="px-3 py-1 rounded-full border border-white/20 bg-white/5">People Analytics Specialist</span>
-          </div>
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="flex flex-wrap justify-center gap-3 mb-12"
+          >
+            {["SQL", "BigQuery", "Tableau", "HR Strategy", "Python"].map((tag) => (
+              <span key={tag} className={`px-4 py-2 rounded-full text-sm font-medium border ${
+                darkMode ? "bg-white/5 border-white/10" : "bg-white border-gray-200"
+              }`}>
+                {tag}
+              </span>
+            ))}
+          </motion.div>
 
-          <div className="mb-4">
-            <span className="px-4 py-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs sm:text-sm font-medium">
-              Interest to Data Analyst • People Analytics in HR
-            </span>
-          </div>
-
-          
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="flex flex-col sm:flex-row gap-4 justify-center"
+          >
+            <a
+              href="#contact"
+              className="px-8 py-4 rounded-full bg-gradient-to-r from-[#0A4D68] to-[#06B6D4] text-white font-bold hover:shadow-lg hover:shadow-[#06B6D4]/25 transition-all hover:-translate-y-1"
+            >
+              Get in Touch
+            </a>
+            <a
+              href="#experience"
+              className={`px-8 py-4 rounded-full font-bold border transition-all hover:-translate-y-1 ${
+                darkMode ? "border-white/20 hover:bg-white/10" : "border-gray-300 hover:bg-gray-100"
+              }`}
+            >
+              View Experience
+            </a>
+          </motion.div>
+        </div>
+        
+        <motion.div 
+          animate={{ y: [0, 10, 0] }}
+          transition={{ repeat: Infinity, duration: 2 }}
+          className="absolute bottom-10 left-1/2 -translate-x-1/2"
+        >
+          <ChevronDown className={mutedText} />
         </motion.div>
       </section>
 
-      {/* ABOUT */}
-      <section id="about" className="py-16 sm:py-24 px-4 sm:px-6 max-w-4xl mx-auto">
-        <h2 className="text-2xl sm:text-3xl font-bold mb-6">About Me (TL;DR)</h2>
-        <p className={`text-base sm:text-lg leading-relaxed ${mutedText}`}>
-          Hi, I’m Faiz. I’m a Performance Data Analyst at GoTo specializing in Performance & Talent Analytics and Performance Management Systems. I turn people data into clear, actionable insights that help PAC and leaders make smoother decisions in the future.
-
-          I focus on performance trends, dashboard development, and building scalable systems that improve evaluation processes, transparency, and organizational growth.
-        </p>
-      </section>
-
-      {/* KEY ACHIEVEMENTS */}
-      <section id="achievements" className="py-12 sm:py-16 px-4 sm:px-6 max-w-4xl mx-auto">
-        <h2 className="text-2xl sm:text-3xl font-bold mb-6">Key Achievements</h2>
-        <div className="grid gap-4 sm:grid-cols-2">
-          {[
-            "Built inhouse HR Performance Management Tools in collaboration with the internal engineer team used by our Employee, HR, and Leaders for performance development and future decisions",
-            "Improved performance data visibility across multiple business units, and Developed scalable analytics report using BigQuery and SQL to support strategic people planning with data-driven insights",
-          ].map((item, i) => (
-            <div
-              key={i}
-              className={`${cardBaseClasses} border rounded-xl p-4 hover:border-blue-400 transition`}
-            >
-              {item}
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* SKILLS */}
-      <section id="skills" className="py-16 sm:py-24 px-4 sm:px-6 max-w-4xl mx-auto">
-        <h2 className="text-2xl sm:text-3xl font-bold mb-8 sm:mb-10">Skills</h2>
-
-        <div className="flex flex-wrap gap-2 mb-6">
-          {skillCategories.map((category) => (
+      {/* Skills Section */}
+      <section id="skills" className="py-24 px-6 max-w-6xl mx-auto">
+        <SectionHeading darkMode={darkMode}>Skills</SectionHeading>
+        
+        <div className="flex flex-wrap justify-center gap-2 mb-12">
+          {skillCategories.map((cat) => (
             <button
-              key={category.category}
-              onClick={() => setActiveSkillTab(category.category)}
-              className={`px-4 py-2 rounded-full border text-sm transition ${
-                activeSkillTab === category.category
-                  ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white border-transparent"
-                  : darkMode
-                  ? "border-white/20 hover:border-blue-400 text-gray-300"
-                  : "border-gray-300 hover:border-blue-400 text-gray-700"
+              key={cat.category}
+              onClick={() => setActiveSkillTab(cat.category)}
+              className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
+                activeSkillTab === cat.category
+                  ? "bg-[#0A4D68] text-white shadow-lg shadow-[#06B6D4]/30"
+                  : darkMode ? "bg-white/5 text-gray-400 hover:bg-white/10" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
               }`}
             >
-              {category.category}
+              {cat.category}
             </button>
           ))}
         </div>
 
-        <div className="space-y-6">
-          {skillCategories
-            .filter((cat) => cat.category === activeSkillTab)
-            .map((category) => (
-              <div key={category.category} className="space-y-6">
-                {category.items.map((skill, index) => (
-                  <motion.div
-                    key={skill.name}
-                    initial={{ opacity: 0, x: -30 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.3, delay: index * 0.05 }}
-                  >
-                    <div className="flex justify-between mb-1">
-                      <span>{skill.name}</span>
-                      <span>{skill.level}%</span>
-                    </div>
-                    <div
-                      className={`w-full rounded-full h-3 overflow-hidden ${
-                        darkMode ? "bg-gray-800" : "bg-gray-300"
-                      }`}
+        <div className="grid md:grid-cols-2 gap-8">
+          <AnimatePresence mode="wait">
+            {skillCategories
+              .filter((cat) => cat.category === activeSkillTab)
+              .map((category) => (
+                <React.Fragment key={category.category}>
+                  {category.items.map((skill, index) => (
+                    <motion.div
+                      key={skill.name}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 20 }}
+                      transition={{ delay: index * 0.1 }}
+                      className="space-y-2"
                     >
-                      <motion.div
-                        initial={{ width: 0 }}
-                        whileInView={{ width: `${skill.level}%` }}
-                        transition={{ duration: 1, delay: index * 0.1 }}
-                        className="h-3 rounded-full bg-gradient-to-r from-blue-500 to-purple-500"
-                      />
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            ))}
+                      <div className="flex justify-between text-sm font-medium">
+                        <span>{skill.name}</span>
+                        <span className={mutedText}>{skill.level}%</span>
+                      </div>
+                      <div className={`h-2 w-full rounded-full overflow-hidden ${darkMode ? "bg-gray-800" : "bg-gray-200"}`}>
+                        <motion.div
+                          initial={{ width: 0 }}
+                          whileInView={{ width: `${skill.level}%` }}
+                          viewport={{ once: true }}
+                          transition={{ duration: 1, delay: 0.2 }}
+                          className="h-full rounded-full bg-gradient-to-r from-[#0A4D68] to-[#06B6D4]"
+                        />
+                      </div>
+                    </motion.div>
+                  ))}
+                </React.Fragment>
+              ))}
+          </AnimatePresence>
         </div>
       </section>
 
-      {/* EXPERIENCE */}
+      {/* Experience Section - ORIGINAL FORMAT (all left-aligned) */}
       <section id="experience" className="py-16 sm:py-24 px-4 sm:px-6 max-w-4xl mx-auto">
-        <h2 className="text-2xl sm:text-3xl font-bold mb-8 sm:mb-10">Experience</h2>
+        <SectionHeading darkMode={darkMode}>Career Journey</SectionHeading>
 
         <div className="relative border-l border-white/20 ml-4 space-y-10">
           {experiences.map((exp, index) => (
             <div key={`${exp.company}-${exp.role}`} className="relative">
               {/* timeline dot */}
-              <div className="absolute -left-[9px] top-2 w-4 h-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-500" />
+              <div className="absolute -left-[9px] top-2 w-4 h-4 rounded-full bg-gradient-to-r from-[#0A4D68] to-[#06B6D4]" />
 
               {/* card */}
               <div
-                onClick={() => setExpanded(expanded === index ? null : index)}
+                onClick={() => setExpandedExp(expandedExp === index ? null : index)}
                 className={`ml-6 border p-4 sm:p-6 rounded-xl transition cursor-pointer ${cardBaseClasses} ${
-                  expanded === index
-                    ? "border-blue-400 shadow-lg shadow-blue-500/10 ring-1 ring-blue-400/40"
-                    : "hover:border-blue-400"
+                  expandedExp === index
+                    ? "border-[#06B6D4] shadow-lg shadow-[#06B6D4]/10 ring-1 ring-[#06B6D4]/40"
+                    : "hover:border-[#06B6D4]"
                 }`}
               >
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-1">
@@ -505,15 +574,15 @@ export default function OnePagePortfolio() {
                   <span className="text-xs sm:text-sm text-gray-400">{exp.period}</span>
                 </div>
 
-                <p className="text-blue-400 mb-2">{exp.company}</p>
+                <p className="text-[#06B6D4] mb-2">{exp.company}</p>
 
                 <p className={mutedText}>{exp.summary}</p>
 
-                {expanded === index && (
+                {expandedExp === index && (
                   <ul className={`mt-4 space-y-2 ${mutedText}`}>
                     {exp.bullets.map((bullet, bulletIndex) => (
                       <li key={bulletIndex} className="flex gap-2 items-start">
-                        <span className="text-blue-400 mt-1">•</span>
+                        <span className="text-[#06B6D4] mt-1">•</span>
                         <span>{bullet}</span>
                       </li>
                     ))}
@@ -525,32 +594,32 @@ export default function OnePagePortfolio() {
         </div>
       </section>
 
-      {/* PROJECTS */}
+      {/* Projects Section - REMOVED ICON */}
       <section id="projects" className="py-16 sm:py-24 px-4 sm:px-6 max-w-4xl mx-auto">
-        <h2 className="text-2xl sm:text-3xl font-bold mb-8 sm:mb-10">Projects</h2>
+        <SectionHeading darkMode={darkMode}>Featured Projects</SectionHeading>
         <div className="space-y-6">
           {projects.map((project, index) => (
             <div
               key={project.name}
               onClick={() =>
-                setExpanded(expanded === index + 100 ? null : index + 100)
+                setExpandedProj(expandedProj === index ? null : index)
               }
               className={`border p-4 sm:p-6 rounded-xl transition cursor-pointer ${cardBaseClasses} ${
-                expanded === index + 100
-                  ? "border-purple-400 shadow-lg shadow-purple-500/10"
-                  : "hover:border-purple-400"
+                expandedProj === index
+                  ? "border-[#06B6D4] shadow-lg shadow-[#06B6D4]/10"
+                  : "hover:border-[#06B6D4]"
               }`}
             >
               <h3 className="text-xl font-semibold">{project.name}</h3>
-              <p className="text-purple-400">{project.company}</p>
+              <p className="text-[#06B6D4]">{project.company}</p>
               <p className="text-sm text-gray-400 mb-2">{project.year}</p>
               <p className={mutedText}>{project.summary}</p>
 
-              {expanded === index + 100 && (
+              {expandedProj === index && (
                 <ul className={`mt-4 space-y-2 ${mutedText}`}>
                   {project.bullets.map((bullet, bulletIndex) => (
                     <li key={bulletIndex} className="flex gap-2 items-start">
-                      <span className="text-purple-400 mt-1">•</span>
+                      <span className="text-[#06B6D4] mt-1">•</span>
                       <span>{bullet}</span>
                     </li>
                   ))}
@@ -561,167 +630,139 @@ export default function OnePagePortfolio() {
         </div>
       </section>
 
-      {/* EDUCATION */}
+      {/* Education Section - WITH CIRCLE LOGO */}
       <section id="education" className="py-16 sm:py-24 px-4 sm:px-6 max-w-4xl mx-auto">
-        <h2 className="text-2xl sm:text-3xl font-bold mb-8 sm:mb-10">Education</h2>
+        <SectionHeading darkMode={darkMode}>Education</SectionHeading>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          className={`${cardBaseClasses} border p-4 sm:p-6 rounded-xl`}
+          className={`${cardBaseClasses} border p-4 sm:p-6 rounded-xl flex flex-col md:flex-row items-center gap-6 text-center md:text-left`}
         >
-          <h3 className="text-xl font-semibold">Universitas Sumatera Utara</h3>
-          <p className="text-blue-400">Diploma in Informatics Engineering</p>
-          <p className="text-sm text-gray-400">2013 – 2016</p>
-          <p className={`mt-2 ${mutedText}`}>GPA: 3.30</p>
+          {/* USU Logo - CIRCLE */}
+          <div className="w-24 h-24 md:w-28 md:h-28 flex-shrink-0 bg-white rounded-full p-2 flex items-center justify-center shadow-lg">
+            <img
+              src="https://res.cloudinary.com/dqszs1x5y/image/upload/v1771670628/Logo_of_North_Sumatra_University.svg_rs9pkq.png"
+              alt="Universitas Sumatera Utara Logo"
+              className="w-full h-full object-contain rounded-full"
+            />
+          </div>
+          
+          <div className="flex-1">
+            <h3 className="text-xl font-semibold">Universitas Sumatera Utara</h3>
+            <p className="text-[#06B6D4]">Diploma in Informatics Engineering</p>
+            <p className="text-sm text-gray-400">2013 – 2016</p>
+            <p className={`mt-2 ${mutedText}`}>GPA: 3.30</p>
+          </div>
         </motion.div>
       </section>
 
-      {/* CERTIFICATIONS */}
-      <section id="certifications" className="py-16 sm:py-24 px-4 sm:px-6 max-w-4xl mx-auto">
-        <h2 className="text-2xl sm:text-3xl font-bold mb-8 sm:mb-10">Certifications</h2>
-
+      {/* Certifications Section - DATE MOVED UNDER ISSUER */}
+      <section id="certifications" className="py-24 px-6 max-w-5xl mx-auto">
+        <SectionHeading darkMode={darkMode}>Certifications</SectionHeading>
+        
         <div className="space-y-6">
+          {certifications.map((cert, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.1 }}
+              className={`${cardBaseClasses} p-6 rounded-2xl transition-all duration-300 hover:border-[#06B6D4]/50`}
+            >
+              <div className="flex flex-col md:flex-row gap-6">
+                {/* Content */}
+                <div className="flex-1">
+                  {/* Title only - no date badge here */}
+                  <h3 className="text-xl font-bold mb-2">{cert.title}</h3>
+                  
+                  {/* Issuer and Date stacked together */}
+                  <div className="mb-3">
+                    <p className="text-[#06B6D4] font-medium">{cert.issuer}</p>
+                    <p className="text-sm text-gray-400">{cert.date}</p>
+                  </div>
+                  
+                  <p className={`mb-4 ${mutedText}`}>{cert.description}</p>
+                  
+                  {cert.link && (
+                    <a
+                      href={cert.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#06B6D4] text-[#06B6D4] hover:bg-[#06B6D4] hover:text-white transition-all text-sm font-medium"
+                    >
+                      <ExternalLink size={14} />
+                      Show Credential
+                    </a>
+                  )}
+                </div>
 
+                {/* Image Preview */}
+                {cert.image && (
+                  <a 
+                    href={cert.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block w-full md:w-48 h-32 rounded-lg overflow-hidden border border-white/10 hover:scale-105 transition-transform flex-shrink-0"
+                  >
+                    <img
+                      src={cert.image}
+                      alt={`${cert.title} Certificate`}
+                      className="w-full h-full object-cover"
+                    />
+                  </a>
+                )}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section id="contact" className="py-24 px-6">
+        <div className="max-w-4xl mx-auto text-center">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.1 }}
-            className={`${cardBaseClasses} border p-4 sm:p-6 rounded-xl hover:border-purple-400 transition`}
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            className={`${cardBaseClasses} p-12 rounded-3xl relative overflow-hidden`}
           >
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
-              {/* left content */}
-              <div className="flex-1">
-                <h3 className="text-xl font-semibold">The Project Management Course: Beginner to PROject Manager</h3>
-                <p className="text-purple-400">Udemy</p>
-                <p className="text-sm text-gray-400">Issued August 2025</p>
-
-                <p className={`mt-3 ${mutedText}`}>
-                  Certification covering project lifecycle, planning, execution, risk management, and stakeholder communication.
-                </p>
-
-                {/* credential link */}
+            <div className="absolute inset-0 bg-gradient-to-r from-[#0A4D68]/20 to-[#06B6D4]/20" />
+            
+            <div className="relative z-10">
+              <h2 className="text-4xl font-bold mb-6">Thank You and Let's Connect!</h2>
+              <p className={`text-lg mb-8 max-w-xl mx-auto ${mutedText}`}>
+                I'm interested in People Analytics and Data Strategy.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row justify-center gap-4">
                 <a
-                  href="https://www.udemy.com/certificate/UC-8f286218-177b-4f0f-9348-4009768a0ab0/"
+                  href="mailto:achmad.faiz@example.com"
+                  className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-white text-black font-bold hover:bg-gray-100 transition-colors"
+                >
+                  <Mail size={20} />
+                  Send Email
+                </a>
+                <a
+                  href="https://linkedin.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-block mt-4 px-4 py-2 rounded-full border border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white transition text-sm"
+                  className={`inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full font-bold border transition-all ${
+                    darkMode ? "border-white/20 hover:bg-white/10" : "border-gray-300 hover:bg-gray-100"
+                  }`}
                 >
-                  Show Credential ↗
+                  <Linkedin size={20} />
+                  LinkedIn Profile
                 </a>
               </div>
-
-              {/* preview image */}
-              <a
-                href="https://www.udemy.com/certificate/UC-8f286218-177b-4f0f-9348-4009768a0ab0/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block w-40 h-28 rounded-lg overflow-hidden border border-white/20 hover:scale-105 transition"
-              >
-                <img
-                  src="https://udemy-certificate.s3.amazonaws.com/image/UC-8f286218-177b-4f0f-9348-4009768a0ab0.jpg?v=1756463361000"
-                  alt="Project Management Certificate Preview"
-                  className="w-full h-full object-cover"
-                />
-              </a>
             </div>
-          </motion.div>
-
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.1 }}
-            className={`${cardBaseClasses} border p-4 sm:p-6 rounded-xl hover:border-purple-400 transition`}
-          >
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
-              {/* left content */}
-              <div className="flex-1">
-                <h3 className="text-xl font-semibold">Global HR Management</h3>
-                <p className="text-purple-400">Udemy</p>
-                <p className="text-sm text-gray-400">Issued July 2025</p>
-
-                <p className={`mt-3 ${mutedText}`}>
-                  Certification covering Navigating International Talent Acquisition, Engagement, and Retention Strategies.
-                </p>
-
-                {/* credential link */}
-                <a
-                  href="https://www.udemy.com/certificate/UC-dd5c84ac-57a4-4f39-b9d8-84898d437ba5/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block mt-4 px-4 py-2 rounded-full border border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-white transition text-sm"
-                >
-                  Show Credential ↗
-                </a>
-              </div>
-
-              {/* preview image */}
-              <a
-                href="https://www.udemy.com/certificate/UC-dd5c84ac-57a4-4f39-b9d8-84898d437ba5/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block w-40 h-28 rounded-lg overflow-hidden border border-white/20 hover:scale-105 transition"
-              >
-                <img
-                  src="https://udemy-certificate.s3.amazonaws.com/image/UC-dd5c84ac-57a4-4f39-b9d8-84898d437ba5.jpg?v=1751636526000"
-                  alt="Global HR Management Certificate Preview"
-                  className="w-full h-full object-cover"
-                />
-              </a>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className={`${cardBaseClasses} border p-4 sm:p-6 rounded-xl hover:border-purple-400 transition`}
-          >
-            <h3 className="text-xl font-semibold">BI-University Advanced Stream</h3>
-            <p className="text-purple-400">GoTo Group</p>
-            <p className="text-sm text-gray-400">Issued August 2019</p>
-            <p className={`mt-3 ${mutedText}`}>
-              Advanced Business Intelligence certification focused on data analysis, SQL, dashboarding, and analytics best practices.
-            </p>
           </motion.div>
           
+          <p className={`mt-12 text-sm ${mutedText}`}>
+            © {new Date().getFullYear()} Achmad Faiz.
+          </p>
         </div>
       </section>
-
-      {/* CONTACT */}
-      <section id="contact" className="py-24 px-6 text-center">
-        <h2 className="text-3xl font-bold mb-6">Thank You • Let's Connect!</h2>
-        <div className="flex justify-center gap-4 sm:gap-6 mb-6">
-          <a href="mailto:" className="hover:text-blue-400">
-            <Mail size={28} />
-          </a>
-          <a
-            href="https://www.linkedin.com/in/achmadf18/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-blue-400"
-          >
-            <Linkedin size={28} />
-          </a>
-        </div>
-
-        {/* Resume Download Button */}
-        <a
-          href="/Achmad_Faiz_Resume.pdf"
-          download
-          className="inline-block px-6 py-3 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-medium hover:scale-105 transition"
-        >
-          Download Resume
-        </a>
-      </section>
-
-      {/* Back to Top Button */}
-      <button
-        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        className="fixed bottom-6 right-6 z-[60] px-4 py-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white text-sm hover:scale-110 transition"
-      >
-        ↑ Top
-      </button>
     </div>
   );
 }
