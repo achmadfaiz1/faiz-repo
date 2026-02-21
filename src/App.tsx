@@ -545,7 +545,7 @@ export default function ImprovedPortfolio() {
             transition={{ delay: 0.3 }}
             className={`text-xl md:text-2xl mb-8 ${mutedText}`}
           >
-            Performance Data Analyst & People Analytics Specialist
+            Performance Data Analyst & People Analytics
           </motion.p>
 
           <motion.div
