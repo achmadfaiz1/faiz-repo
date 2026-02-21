@@ -332,43 +332,35 @@ export default function ImprovedPortfolio() {
           ))}
         </div>
 
-        {/* Mobile Menu Toggle */}
-        <div className="md:hidden fixed top-4 right-4 z-50">
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className={`p-3 rounded-full backdrop-blur-md border ${
-              darkMode ? "bg-black/50 border-white/10" : "bg-white/80 border-gray-200"
-            }`}
-          >
-            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
-        </div>
+        {/* Mobile Burger Button - TOP LEFT like original */}
+        <button
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="md:hidden fixed top-6 left-6 z-[60] p-3 rounded-full backdrop-blur-lg border bg-white/10 border-white/20 hover:bg-white/20 transition"
+          aria-label="Toggle menu"
+        >
+          {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
+        </button>
       </motion.nav>
 
-      {/* Mobile Menu Overlay */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className={`fixed inset-0 z-40 md:hidden flex flex-col items-center justify-center gap-6 ${
-              darkMode ? "bg-black/95" : "bg-white/95"
-            } backdrop-blur-xl`}
-          >
-            {navItems.map((item) => (
-              <a
-                key={item.id}
-                href={`#${item.id}`}
-                onClick={() => setMobileMenuOpen(false)}
-                className={`text-2xl font-bold ${activeSection === item.id ? gradientText : ""}`}
-              >
-                {item.label}
-              </a>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Mobile Menu Panel - COMPACT DROPDOWN (not full screen) */}
+      {mobileMenuOpen && (
+        <div className="md:hidden fixed top-20 left-6 right-6 z-[55] backdrop-blur-lg border border-white/20 bg-white/10 rounded-2xl p-4 flex flex-col gap-2">
+          {navItems.map((item) => (
+            <a
+              key={item.id}
+              href={`#${item.id}`}
+              onClick={() => setMobileMenuOpen(false)}
+              className={`capitalize px-3 py-2 rounded-lg transition ${
+                activeSection === item.id
+                  ? "bg-gradient-to-r from-[#0A4D68] to-[#06B6D4] text-white"
+                  : mutedText
+              }`}
+            >
+              {item.label}
+            </a>
+          ))}
+        </div>
+      )}
 
       {/* Theme Toggle */}
       <button
