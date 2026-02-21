@@ -83,14 +83,14 @@ export default function ImprovedPortfolio() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSkillTab, setActiveSkillTab] = useState("Core Skills");
   const [showBackToTop, setShowBackToTop] = useState(false);
-  
-  // Separate expanded states - REMOVED unused expandedCert
   const [expandedExp, setExpandedExp] = useState<number | null>(null);
   const [expandedProj, setExpandedProj] = useState<number | null>(null);
+  
+  // Loading progress bar state
+  const [loadingProgress, setLoadingProgress] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
   // --- Google Analytics Setup ---
-  
-  // Inject GA script on mount
   useEffect(() => {
     const script1 = document.createElement('script');
     script1.async = true;
@@ -112,7 +112,6 @@ export default function ImprovedPortfolio() {
     };
   }, []);
 
-  // Track section views when activeSection changes
   useEffect(() => {
     if (typeof window.gtag === 'function') {
       window.gtag('event', 'page_view', {
@@ -122,7 +121,6 @@ export default function ImprovedPortfolio() {
     }
   }, [activeSection]);
 
-  // Track custom events helper
   const trackEvent = (action: string, category: string, label?: string) => {
     if (typeof window.gtag === 'function') {
       window.gtag('event', action, {
@@ -131,6 +129,24 @@ export default function ImprovedPortfolio() {
       });
     }
   };
+
+  // --- Loading Progress Bar Effect ---
+  useEffect(() => {
+    // Simulate loading progress
+    const interval = setInterval(() => {
+      setLoadingProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          setTimeout(() => setIsLoading(false), 300);
+          return 100;
+        }
+        // Random increment for realistic feel
+        return prev + Math.random() * 15 + 5;
+      });
+    }, 150);
+
+    return () => clearInterval(interval);
+  }, []);
 
   // --- Data ---
   const navItems = [
@@ -151,7 +167,6 @@ export default function ImprovedPortfolio() {
         { name: "SQL & BigQuery", level: 92 },
         { name: "Dashboard & Visualization", level: 90 },
         { name: "Performance Management", level: 94 },
-        { name: "Project Management", level: 90 },
       ],
     },
     {
@@ -162,14 +177,17 @@ export default function ImprovedPortfolio() {
         { name: "R Studio", level: 85 },
         { name: "BigQuery", level: 95 },
         { name: "Tableau / Looker", level: 88 },
+        { name: "DBeaver", level: 90 },
       ],
     },
     {
       category: "Human Resource",
       items: [
         { name: "Talent Management", level: 95 },
+        { name: "Performance Management", level: 94 },
         { name: "Talent Acquisition", level: 85 },
         { name: "HR Tools Development", level: 88 },
+        { name: "Lever ATS", level: 85 },
       ],
     },
     {
@@ -179,9 +197,17 @@ export default function ImprovedPortfolio() {
         { name: "Bahasa Indonesia (Native)", level: 100 },
       ],
     },
+    {
+      category: "Supporting Skills",
+      items: [
+        { name: "Usability Testing", level: 90 },
+        { name: "Figma", level: 85 },
+        { name: "Google Workspace", level: 95 },
+        { name: "Microsoft Office", level: 95 },
+      ],
+    },
   ];
 
-  // ALL EXPERIENCES RESTORED
   const experiences: ExperienceItem[] = [
     {
       role: "Performance Data Analyst",
@@ -298,17 +324,13 @@ export default function ImprovedPortfolio() {
   // --- Effects ---
   useEffect(() => {
     const handleScroll = () => {
-      // Progress Bar
       const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
       const progress = (window.scrollY / totalHeight) * 100;
       setScrollProgress(progress);
-
-      // Show/hide back to top button
       setShowBackToTop(window.scrollY > 500);
 
-      // Active Section Detection
       const sections = document.querySelectorAll("section");
-      const scrollPosition = window.scrollY + 150; // Offset for sticky header
+      const scrollPosition = window.scrollY + 150;
 
       sections.forEach((section) => {
         const element = section as HTMLElement;
@@ -338,13 +360,42 @@ export default function ImprovedPortfolio() {
   const mutedText = darkMode ? "text-gray-400" : "text-gray-600";
   const gradientText = "bg-clip-text text-transparent bg-gradient-to-r from-[#0A4D68] to-[#06B6D4]";
 
-  // Deep Sea Blue: #0A4D68
-  // Sky Blue: #06B6D4
-
   return (
     <div className={`${themeClasses} min-h-screen font-sans selection:bg-[#0A4D68] selection:text-white transition-colors duration-500`}>
       
-      {/* Progress Bar */}
+      {/* GRAIN TEXTURE OVERLAY - Fixed full screen */}
+      <div 
+        className="fixed inset-0 pointer-events-none z-[9999] opacity-[0.03]"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+        }}
+      />
+
+      {/* LOADING PROGRESS BAR - Shows on initial load */}
+      <AnimatePresence>
+        {isLoading && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-[10000] bg-[#0a0a0a] flex flex-col items-center justify-center"
+          >
+            <div className="w-64 h-1 bg-gray-800 rounded-full overflow-hidden">
+              <motion.div
+                className="h-full bg-gradient-to-r from-[#0A4D68] to-[#06B6D4]"
+                initial={{ width: 0 }}
+                animate={{ width: `${Math.min(loadingProgress, 100)}%` }}
+                transition={{ duration: 0.1 }}
+              />
+            </div>
+            <p className="mt-4 text-sm text-gray-400 font-medium">
+              {Math.round(Math.min(loadingProgress, 100))}%
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* SCROLL PROGRESS BAR */}
       <div className="fixed top-0 left-0 w-full h-1 bg-gray-200/10 z-[100]">
         <motion.div
           className="h-full bg-gradient-to-r from-[#0A4D68] to-[#06B6D4]"
@@ -387,7 +438,6 @@ export default function ImprovedPortfolio() {
           ))}
         </div>
 
-        {/* Mobile Burger Button - TOP LEFT like original */}
         <button
           onClick={() => {
             setMobileMenuOpen(!mobileMenuOpen);
@@ -400,7 +450,6 @@ export default function ImprovedPortfolio() {
         </button>
       </motion.nav>
 
-      {/* Mobile Menu Panel - COMPACT DROPDOWN (not full screen) */}
       {mobileMenuOpen && (
         <div className="md:hidden fixed top-20 left-6 right-6 z-[55] backdrop-blur-lg border border-white/20 bg-white/10 rounded-2xl p-4 flex flex-col gap-2">
           {navItems.map((item) => (
@@ -423,7 +472,6 @@ export default function ImprovedPortfolio() {
         </div>
       )}
 
-      {/* Theme Toggle */}
       <button
         onClick={() => {
           setDarkMode(!darkMode);
@@ -436,7 +484,6 @@ export default function ImprovedPortfolio() {
         {darkMode ? <Sun size={20} /> : <Moon size={20} />}
       </button>
 
-      {/* Back to Top Button */}
       <AnimatePresence>
         {showBackToTop && (
           <motion.button
@@ -458,7 +505,6 @@ export default function ImprovedPortfolio() {
 
       {/* Hero Section */}
       <section id="about" className="min-h-screen flex items-center justify-center relative px-6 pt-20">
-        {/* Background Elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className={`absolute top-1/4 left-1/4 w-96 h-96 rounded-full blur-[120px] opacity-20 ${
             darkMode ? "bg-[#0A4D68]" : "bg-[#0A4D68]"
@@ -610,17 +656,15 @@ export default function ImprovedPortfolio() {
         </div>
       </section>
 
-      {/* Experience Section - ORIGINAL FORMAT (all left-aligned) */}
+      {/* Experience Section */}
       <section id="experience" className="py-16 sm:py-24 px-4 sm:px-6 max-w-4xl mx-auto">
         <SectionHeading darkMode={darkMode}>Career Journey</SectionHeading>
 
         <div className="relative border-l border-white/20 ml-4 space-y-10">
           {experiences.map((exp, index) => (
             <div key={`${exp.company}-${exp.role}`} className="relative">
-              {/* timeline dot */}
               <div className="absolute -left-[9px] top-2 w-4 h-4 rounded-full bg-gradient-to-r from-[#0A4D68] to-[#06B6D4]" />
 
-              {/* card */}
               <div
                 onClick={() => {
                   setExpandedExp(expandedExp === index ? null : index);
@@ -657,7 +701,7 @@ export default function ImprovedPortfolio() {
         </div>
       </section>
 
-      {/* Projects Section - REMOVED ICON */}
+      {/* Projects Section */}
       <section id="projects" className="py-16 sm:py-24 px-4 sm:px-6 max-w-4xl mx-auto">
         <SectionHeading darkMode={darkMode}>Featured Projects</SectionHeading>
         <div className="space-y-6">
@@ -694,7 +738,7 @@ export default function ImprovedPortfolio() {
         </div>
       </section>
 
-      {/* Education Section - WITH CIRCLE LOGO */}
+      {/* Education Section */}
       <section id="education" className="py-16 sm:py-24 px-4 sm:px-6 max-w-4xl mx-auto">
         <SectionHeading darkMode={darkMode}>Education</SectionHeading>
         <motion.div
@@ -702,7 +746,6 @@ export default function ImprovedPortfolio() {
           whileInView={{ opacity: 1, y: 0 }}
           className={`${cardBaseClasses} border p-4 sm:p-6 rounded-xl flex flex-col md:flex-row items-center gap-6 text-center md:text-left`}
         >
-          {/* USU Logo - CIRCLE */}
           <div className="w-24 h-24 md:w-28 md:h-28 flex-shrink-0 bg-white rounded-full p-2 flex items-center justify-center shadow-lg">
             <img
               src="https://res.cloudinary.com/dqszs1x5y/image/upload/v1771670628/Logo_of_North_Sumatra_University.svg_rs9pkq.png  "
@@ -720,7 +763,7 @@ export default function ImprovedPortfolio() {
         </motion.div>
       </section>
 
-      {/* Certifications Section - DATE MOVED UNDER ISSUER */}
+      {/* Certifications Section */}
       <section id="certifications" className="py-24 px-6 max-w-5xl mx-auto">
         <SectionHeading darkMode={darkMode}>Certifications</SectionHeading>
         
@@ -735,12 +778,9 @@ export default function ImprovedPortfolio() {
               className={`${cardBaseClasses} p-6 rounded-2xl transition-all duration-300 hover:border-[#06B6D4]/50`}
             >
               <div className="flex flex-col md:flex-row gap-6">
-                {/* Content */}
                 <div className="flex-1">
-                  {/* Title only - no date badge here */}
                   <h3 className="text-xl font-bold mb-2">{cert.title}</h3>
                   
-                  {/* Issuer and Date stacked together */}
                   <div className="mb-3">
                     <p className="text-[#06B6D4] font-medium">{cert.issuer}</p>
                     <p className="text-sm text-gray-400">{cert.date}</p>
@@ -762,7 +802,6 @@ export default function ImprovedPortfolio() {
                   )}
                 </div>
 
-                {/* Image Preview */}
                 {cert.image && (
                   <a 
                     href={cert.link}
