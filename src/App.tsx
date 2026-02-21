@@ -151,6 +151,7 @@ export default function ImprovedPortfolio() {
         { name: "SQL & BigQuery", level: 92 },
         { name: "Dashboard & Visualization", level: 90 },
         { name: "Performance Management", level: 94 },
+        { name: "Project Management", level: 90 },
       ],
     },
     {
