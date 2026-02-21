@@ -158,7 +158,7 @@ export default function ImprovedPortfolio() {
         hour: "2-digit",
         minute: "2-digit",
         second: "2-digit",
-        hour12: false,
+        hour12: true,
       });
       setCurrentTime(jakartaTime);
     };
@@ -463,9 +463,9 @@ export default function ImprovedPortfolio() {
           <div className={`hidden md:flex items-center gap-2 px-4 py-2 rounded-full border backdrop-blur-md ${
             darkMode ? "bg-black/40 border-white/10 text-gray-300" : "bg-white/60 border-gray-200 text-gray-700"
           }`}>
-            <Clock size={14} className="text-[#06B6D4]" />
+            <span className="text-sm font-medium">Jakarta</span>
+            <span className="text-gray-500">•</span>
             <span className="text-sm font-mono font-medium">{currentTime}</span>
-            <span className="text-xs text-gray-500 ml-1">WIB</span>
           </div>
         </div>
 
