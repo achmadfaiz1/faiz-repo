@@ -76,10 +76,9 @@ export default function ImprovedPortfolio() {
   const [activeSkillTab, setActiveSkillTab] = useState("Core Skills");
   const [showBackToTop, setShowBackToTop] = useState(false);
   
-  // Separate expanded states to avoid index collision bugs
+  // Separate expanded states - REMOVED unused expandedCert
   const [expandedExp, setExpandedExp] = useState<number | null>(null);
   const [expandedProj, setExpandedProj] = useState<number | null>(null);
-  const [expandedCert, setExpandedCert] = useState<number | null>(null);
 
   // --- Data ---
   const navItems = [
@@ -224,16 +223,16 @@ export default function ImprovedPortfolio() {
       issuer: "Udemy",
       date: "August 2025",
       description: "Certification covering project lifecycle, planning, execution, risk management, and stakeholder communication.",
-      link: "https://www.udemy.com/certificate/UC-8f286218-177b-4f0f-9348-4009768a0ab0/",
-      image: "https://udemy-certificate.s3.amazonaws.com/image/UC-8f286218-177b-4f0f-9348-4009768a0ab0.jpg?v=1756463361000"
+      link: "https://www.udemy.com/certificate/UC-8f286218-177b-4f0f-9348-4009768a0ab0/ ",
+      image: "https://udemy-certificate.s3.amazonaws.com/image/UC-8f286218-177b-4f0f-9348-4009768a0ab0.jpg?v=1756463361000 "
     },
     {
       title: "Global HR Management",
       issuer: "Udemy",
       date: "July 2025",
       description: "Certification covering Navigating International Talent Acquisition, Engagement, and Retention Strategies.",
-      link: "https://www.udemy.com/certificate/UC-dd5c84ac-57a4-4f39-b9d8-84898d437ba5/",
-      image: "https://udemy-certificate.s3.amazonaws.com/image/UC-dd5c84ac-57a4-4f39-b9d8-84898d437ba5.jpg?v=1751636526000"
+      link: "https://www.udemy.com/certificate/UC-dd5c84ac-57a4-4f39-b9d8-84898d437ba5/ ",
+      image: "https://udemy-certificate.s3.amazonaws.com/image/UC-dd5c84ac-57a4-4f39-b9d8-84898d437ba5.jpg?v=1751636526000 "
     },
     {
       title: "BI-University Advanced Stream",
@@ -422,7 +421,7 @@ export default function ImprovedPortfolio() {
           >
             <div className="w-32 h-32 md:w-40 md:h-40 rounded-full p-1 bg-gradient-to-tr from-[#0A4D68] to-[#06B6D4]">
               <img
-                src="https://res.cloudinary.com/dqszs1x5y/image/upload/v1771588295/WhatsApp_Image_2026-02-20_at_6.49.42_PM_nvzmpy.jpg"
+                src="https://res.cloudinary.com/dqszs1x5y/image/upload/v1771588295/WhatsApp_Image_2026-02-20_at_6.49.42_PM_nvzmpy.jpg "
                 alt="Achmad Faiz"
                 className="w-full h-full rounded-full object-cover border-4 border-black"
               />
@@ -641,7 +640,7 @@ export default function ImprovedPortfolio() {
           {/* USU Logo - CIRCLE */}
           <div className="w-24 h-24 md:w-28 md:h-28 flex-shrink-0 bg-white rounded-full p-2 flex items-center justify-center shadow-lg">
             <img
-              src="https://res.cloudinary.com/dqszs1x5y/image/upload/v1771670628/Logo_of_North_Sumatra_University.svg_rs9pkq.png"
+              src="https://res.cloudinary.com/dqszs1x5y/image/upload/v1771670628/Logo_of_North_Sumatra_University.svg_rs9pkq.png "
               alt="Universitas Sumatera Utara Logo"
               className="w-full h-full object-contain rounded-full"
             />
@@ -744,7 +743,7 @@ export default function ImprovedPortfolio() {
                   Send Email
                 </a>
                 <a
-                  href="https://linkedin.com"
+                  href="https://linkedin.com "
                   target="_blank"
                   rel="noopener noreferrer"
                   className={`inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full font-bold border transition-all ${
