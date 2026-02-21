@@ -67,6 +67,14 @@ const SectionHeading = ({ children, darkMode }: { children: React.ReactNode; dar
   </motion.h2>
 );
 
+// Declare gtag for TypeScript
+declare global {
+  interface Window {
+    gtag: (...args: any[]) => void;
+    dataLayer: any[];
+  }
+}
+
 export default function ImprovedPortfolio() {
   // --- State ---
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -79,6 +87,50 @@ export default function ImprovedPortfolio() {
   // Separate expanded states - REMOVED unused expandedCert
   const [expandedExp, setExpandedExp] = useState<number | null>(null);
   const [expandedProj, setExpandedProj] = useState<number | null>(null);
+
+  // --- Google Analytics Setup ---
+  
+  // Inject GA script on mount
+  useEffect(() => {
+    const script1 = document.createElement('script');
+    script1.async = true;
+    script1.src = 'https://www.googletagmanager.com/gtag/js?id=G-B1RQYWDG2E';
+    document.head.appendChild(script1);
+
+    const script2 = document.createElement('script');
+    script2.innerHTML = `
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-B1RQYWDG2E');
+    `;
+    document.head.appendChild(script2);
+
+    return () => {
+      document.head.removeChild(script1);
+      document.head.removeChild(script2);
+    };
+  }, []);
+
+  // Track section views when activeSection changes
+  useEffect(() => {
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', 'page_view', {
+        page_title: activeSection,
+        page_location: window.location.href + '#' + activeSection,
+      });
+    }
+  }, [activeSection]);
+
+  // Track custom events helper
+  const trackEvent = (action: string, category: string, label?: string) => {
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', action, {
+        event_category: category,
+        event_label: label,
+      });
+    }
+  };
 
   // --- Data ---
   const navItems = [
@@ -223,16 +275,16 @@ export default function ImprovedPortfolio() {
       issuer: "Udemy",
       date: "August 2025",
       description: "Certification covering project lifecycle, planning, execution, risk management, and stakeholder communication.",
-      link: "https://www.udemy.com/certificate/UC-8f286218-177b-4f0f-9348-4009768a0ab0/ ",
-      image: "https://udemy-certificate.s3.amazonaws.com/image/UC-8f286218-177b-4f0f-9348-4009768a0ab0.jpg?v=1756463361000 "
+      link: "https://www.udemy.com/certificate/UC-8f286218-177b-4f0f-9348-4009768a0ab0/  ",
+      image: "https://udemy-certificate.s3.amazonaws.com/image/UC-8f286218-177b-4f0f-9348-4009768a0ab0.jpg?v=1756463361000  "
     },
     {
       title: "Global HR Management",
       issuer: "Udemy",
       date: "July 2025",
       description: "Certification covering Navigating International Talent Acquisition, Engagement, and Retention Strategies.",
-      link: "https://www.udemy.com/certificate/UC-dd5c84ac-57a4-4f39-b9d8-84898d437ba5/ ",
-      image: "https://udemy-certificate.s3.amazonaws.com/image/UC-dd5c84ac-57a4-4f39-b9d8-84898d437ba5.jpg?v=1751636526000 "
+      link: "https://www.udemy.com/certificate/UC-dd5c84ac-57a4-4f39-b9d8-84898d437ba5/  ",
+      image: "https://udemy-certificate.s3.amazonaws.com/image/UC-dd5c84ac-57a4-4f39-b9d8-84898d437ba5.jpg?v=1751636526000  "
     },
     {
       title: "BI-University Advanced Stream",
@@ -274,6 +326,7 @@ export default function ImprovedPortfolio() {
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
+    trackEvent('click', 'button', 'Back to Top');
   };
 
   // --- Styles ---
@@ -311,6 +364,7 @@ export default function ImprovedPortfolio() {
             <a
               key={item.id}
               href={`#${item.id}`}
+              onClick={() => trackEvent('click', 'nav', item.label)}
               className={`relative px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
                 activeSection === item.id
                   ? "text-white"
@@ -334,7 +388,10 @@ export default function ImprovedPortfolio() {
 
         {/* Mobile Burger Button - TOP LEFT like original */}
         <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          onClick={() => {
+            setMobileMenuOpen(!mobileMenuOpen);
+            trackEvent('click', 'button', 'Mobile Menu Toggle');
+          }}
           className="md:hidden fixed top-6 left-6 z-[60] p-3 rounded-full backdrop-blur-lg border bg-white/10 border-white/20 hover:bg-white/20 transition"
           aria-label="Toggle menu"
         >
@@ -349,7 +406,10 @@ export default function ImprovedPortfolio() {
             <a
               key={item.id}
               href={`#${item.id}`}
-              onClick={() => setMobileMenuOpen(false)}
+              onClick={() => {
+                setMobileMenuOpen(false);
+                trackEvent('click', 'mobile_nav', item.label);
+              }}
               className={`capitalize px-3 py-2 rounded-lg transition ${
                 activeSection === item.id
                   ? "bg-gradient-to-r from-[#0A4D68] to-[#06B6D4] text-white"
@@ -364,7 +424,10 @@ export default function ImprovedPortfolio() {
 
       {/* Theme Toggle */}
       <button
-        onClick={() => setDarkMode(!darkMode)}
+        onClick={() => {
+          setDarkMode(!darkMode);
+          trackEvent('click', 'button', `Theme Toggle ${!darkMode ? 'Dark' : 'Light'}`);
+        }}
         className={`fixed bottom-6 right-6 z-50 p-3 rounded-full backdrop-blur-md border transition-all hover:scale-110 ${
           darkMode ? "bg-white/10 border-white/20 text-[#06B6D4]" : "bg-white border-gray-200 text-[#0A4D68] shadow-lg"
         }`}
@@ -413,7 +476,7 @@ export default function ImprovedPortfolio() {
           >
             <div className="w-32 h-32 md:w-40 md:h-40 rounded-full p-1 bg-gradient-to-tr from-[#0A4D68] to-[#06B6D4]">
               <img
-                src="https://res.cloudinary.com/dqszs1x5y/image/upload/v1771588295/WhatsApp_Image_2026-02-20_at_6.49.42_PM_nvzmpy.jpg "
+                src="https://res.cloudinary.com/dqszs1x5y/image/upload/v1771588295/WhatsApp_Image_2026-02-20_at_6.49.42_PM_nvzmpy.jpg  "
                 alt="Achmad Faiz"
                 className="w-full h-full rounded-full object-cover border-4 border-black"
               />
@@ -461,12 +524,14 @@ export default function ImprovedPortfolio() {
           >
             <a
               href="#contact"
+              onClick={() => trackEvent('click', 'button', 'Get in Touch')}
               className="px-8 py-4 rounded-full bg-gradient-to-r from-[#0A4D68] to-[#06B6D4] text-white font-bold hover:shadow-lg hover:shadow-[#06B6D4]/25 transition-all hover:-translate-y-1"
             >
               Get in Touch
             </a>
             <a
               href="#experience"
+              onClick={() => trackEvent('click', 'button', 'View Experience')}
               className={`px-8 py-4 rounded-full font-bold border transition-all hover:-translate-y-1 ${
                 darkMode ? "border-white/20 hover:bg-white/10" : "border-gray-300 hover:bg-gray-100"
               }`}
@@ -493,7 +558,10 @@ export default function ImprovedPortfolio() {
           {skillCategories.map((cat) => (
             <button
               key={cat.category}
-              onClick={() => setActiveSkillTab(cat.category)}
+              onClick={() => {
+                setActiveSkillTab(cat.category);
+                trackEvent('click', 'skill_tab', cat.category);
+              }}
               className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
                 activeSkillTab === cat.category
                   ? "bg-[#0A4D68] text-white shadow-lg shadow-[#06B6D4]/30"
@@ -553,7 +621,10 @@ export default function ImprovedPortfolio() {
 
               {/* card */}
               <div
-                onClick={() => setExpandedExp(expandedExp === index ? null : index)}
+                onClick={() => {
+                  setExpandedExp(expandedExp === index ? null : index);
+                  trackEvent('click', 'experience', `${exp.role} - ${exp.company}`);
+                }}
                 className={`ml-6 border p-4 sm:p-6 rounded-xl transition cursor-pointer ${cardBaseClasses} ${
                   expandedExp === index
                     ? "border-[#06B6D4] shadow-lg shadow-[#06B6D4]/10 ring-1 ring-[#06B6D4]/40"
@@ -592,9 +663,10 @@ export default function ImprovedPortfolio() {
           {projects.map((project, index) => (
             <div
               key={project.name}
-              onClick={() =>
-                setExpandedProj(expandedProj === index ? null : index)
-              }
+              onClick={() => {
+                setExpandedProj(expandedProj === index ? null : index);
+                trackEvent('click', 'project', project.name);
+              }}
               className={`border p-4 sm:p-6 rounded-xl transition cursor-pointer ${cardBaseClasses} ${
                 expandedProj === index
                   ? "border-[#06B6D4] shadow-lg shadow-[#06B6D4]/10"
@@ -632,7 +704,7 @@ export default function ImprovedPortfolio() {
           {/* USU Logo - CIRCLE */}
           <div className="w-24 h-24 md:w-28 md:h-28 flex-shrink-0 bg-white rounded-full p-2 flex items-center justify-center shadow-lg">
             <img
-              src="https://res.cloudinary.com/dqszs1x5y/image/upload/v1771670628/Logo_of_North_Sumatra_University.svg_rs9pkq.png "
+              src="https://res.cloudinary.com/dqszs1x5y/image/upload/v1771670628/Logo_of_North_Sumatra_University.svg_rs9pkq.png  "
               alt="Universitas Sumatera Utara Logo"
               className="w-full h-full object-contain rounded-full"
             />
@@ -680,6 +752,7 @@ export default function ImprovedPortfolio() {
                       href={cert.link}
                       target="_blank"
                       rel="noopener noreferrer"
+                      onClick={() => trackEvent('click', 'certificate', cert.title)}
                       className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#06B6D4] text-[#06B6D4] hover:bg-[#06B6D4] hover:text-white transition-all text-sm font-medium"
                     >
                       <ExternalLink size={14} />
@@ -694,6 +767,7 @@ export default function ImprovedPortfolio() {
                     href={cert.link}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => trackEvent('click', 'certificate_image', cert.title)}
                     className="block w-full md:w-48 h-32 rounded-lg overflow-hidden border border-white/10 hover:scale-105 transition-transform flex-shrink-0"
                   >
                     <img
@@ -729,15 +803,17 @@ export default function ImprovedPortfolio() {
               <div className="flex flex-col sm:flex-row justify-center gap-4">
                 <a
                   href="mailto:"
+                  onClick={() => trackEvent('click', 'button', 'Send Email')}
                   className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-white text-black font-bold hover:bg-gray-100 transition-colors"
                 >
                   <Mail size={20} />
                   Send Email
                 </a>
                 <a
-                  href="https://linkedin.com "
+                  href="https://linkedin.com  "
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => trackEvent('click', 'external_link', 'LinkedIn')}
                   className={`inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full font-bold border transition-all ${
                     darkMode ? "border-white/20 hover:bg-white/10" : "border-gray-300 hover:bg-gray-100"
                   }`}
