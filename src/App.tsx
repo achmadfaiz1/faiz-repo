@@ -14,8 +14,7 @@ import {
   Code,
   User,
   FileBadge,
-  ArrowUp,
-  Clock
+  ArrowUp
 } from "lucide-react";
 
 // --- Types ---
