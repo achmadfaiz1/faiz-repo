@@ -1,103 +1,97 @@
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  Mail,
-  Linkedin,
-  Sun,
-  Moon,
-  Menu,
-  X,
-  ChevronDown,
-  ExternalLink,
-  Briefcase,
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { 
+  Sun, 
+  Moon, 
+  User, 
+  Briefcase, 
+  Code2, 
+  FolderOpen, 
+  Mail, 
+  ArrowUp, 
+  ArrowDown,
+  MapPin,
+  ChevronRight,
+  Database,
+  BarChart3,
+  Users,
   GraduationCap,
-  Code,
-  User,
-  FileBadge,
-  ArrowUp
-} from "lucide-react";
+  Award,
+  Linkedin,
+  Search,
+  Target,
+  ExternalLink
+} from 'lucide-react';
 
-// --- Types ---
-interface Skill {
-  name: string;
-  level: number;
-}
+// Theme Context
+const ThemeContext = React.createContext();
 
-interface SkillCategory {
-  category: string;
-  items: Skill[];
-}
+const ThemeProvider = ({ children }) => {
+  const [isDark, setIsDark] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
-interface ExperienceItem {
-  role: string;
-  company: string;
-  period: string;
-  summary: string;
-  bullets: string[];
-}
-
-interface ProjectItem {
-  name: string;
-  company: string;
-  year: string;
-  summary: string;
-  bullets: string[];
-}
-
-interface CertificationItem {
-  title: string;
-  issuer: string;
-  date: string;
-  description: string;
-  link?: string;
-  image?: string;
-}
-
-// --- Components ---
-
-const SectionHeading = ({ children, darkMode }: { children: React.ReactNode; darkMode: boolean }) => (
-  <motion.h2
-    initial={{ opacity: 0, y: 20 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true }}
-    className={`text-3xl md:text-4xl font-bold mb-12 text-center ${darkMode ? "text-white" : "text-gray-900"}`}
-  >
-    {children}
-    <div className="w-16 h-1 bg-gradient-to-r from-[#0A4D68] to-[#06B6D4] mx-auto mt-4 rounded-full" />
-  </motion.h2>
-);
-
-// Declare gtag for TypeScript
-declare global {
-  interface Window {
-    gtag: (...args: any[]) => void;
-    dataLayer: any[];
-  }
-}
-
-export default function ImprovedPortfolio() {
-  // --- State ---
-  const [scrollProgress, setScrollProgress] = useState(0);
-  const [darkMode, setDarkMode] = useState(true);
-  const [activeSection, setActiveSection] = useState("about");
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [activeSkillTab, setActiveSkillTab] = useState("Core Skills");
-  const [showBackToTop, setShowBackToTop] = useState(false);
-  const [expandedExp, setExpandedExp] = useState<number | null>(null);
-  const [expandedProj, setExpandedProj] = useState<number | null>(null);
-  const [currentTime, setCurrentTime] = useState<string>("");
-  
-  // Loading progress bar state
-  const [loadingProgress, setLoadingProgress] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
-
-  // --- Google Analytics Setup ---
   useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') setIsDark(true);
+    else if (savedTheme === 'light') setIsDark(false);
+    else if (window.matchMedia('(prefers-color-scheme: dark)').matches) setIsDark(true);
+  }, []);
+
+  const toggleTheme = useCallback((e) => {
+    const x = e?.clientX ?? window.innerWidth / 2;
+    const y = e?.clientY ?? window.innerHeight / 2;
+    
+    setIsTransitioning(true);
+    
+    const ripple = document.createElement('div');
+    ripple.style.position = 'fixed';
+    ripple.style.left = x + 'px';
+    ripple.style.top = y + 'px';
+    ripple.style.width = '10px';
+    ripple.style.height = '10px';
+    ripple.style.background = isDark ? '#f0f9ff' : '#0c4a6e';
+    ripple.style.borderRadius = '50%';
+    ripple.style.pointerEvents = 'none';
+    ripple.style.zIndex = '9999';
+    ripple.style.transform = 'translate(-50%, -50%)';
+    ripple.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+    document.body.appendChild(ripple);
+
+    requestAnimationFrame(() => {
+      const maxDim = Math.max(window.innerWidth, window.innerHeight);
+      ripple.style.width = maxDim * 2.5 + 'px';
+      ripple.style.height = maxDim * 2.5 + 'px';
+    });
+
+    setTimeout(() => {
+      setIsDark(prev => {
+        const newTheme = !prev;
+        localStorage.setItem('theme', newTheme ? 'dark' : 'light');
+        return newTheme;
+      });
+      
+      setTimeout(() => {
+        ripple.remove();
+        setIsTransitioning(false);
+      }, 800);
+    }, 400);
+  }, [isDark]);
+
+  return (
+    <ThemeContext.Provider value={{ isDark, toggleTheme, isTransitioning }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+};
+
+// Google Analytics Hook
+const useGoogleAnalytics = () => {
+  useEffect(() => {
+    // Create script element for gtag.js
     const script1 = document.createElement('script');
     script1.async = true;
     script1.src = 'https://www.googletagmanager.com/gtag/js?id=G-B1RQYWDG2E';
-    document.head.appendChild(script1);
-
+    
+    // Create script element for gtag config
     const script2 = document.createElement('script');
     script2.innerHTML = `
       window.dataLayer = window.dataLayer || [];
@@ -105,801 +99,1058 @@ export default function ImprovedPortfolio() {
       gtag('js', new Date());
       gtag('config', 'G-B1RQYWDG2E');
     `;
+    
+    // Insert scripts into head
+    document.head.appendChild(script1);
     document.head.appendChild(script2);
-
+    
+    // Cleanup function
     return () => {
       document.head.removeChild(script1);
       document.head.removeChild(script2);
     };
   }, []);
+};
+
+// Scroll Progress Bar Component
+const ScrollProgressBar = ({ isDark }) => {
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    if (typeof window.gtag === 'function') {
-      window.gtag('event', 'page_view', {
-        page_title: activeSection,
-        page_location: window.location.href + '#' + activeSection,
-      });
-    }
-  }, [activeSection]);
-
-  const trackEvent = (action: string, category: string, label?: string) => {
-    if (typeof window.gtag === 'function') {
-      window.gtag('event', action, {
-        event_category: category,
-        event_label: label,
-      });
-    }
-  };
-
-  // --- Loading Progress Bar Effect ---
-  useEffect(() => {
-    // Simulate loading progress
-    const interval = setInterval(() => {
-      setLoadingProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setTimeout(() => setIsLoading(false), 300);
-          return 100;
-        }
-        // Random increment for realistic feel
-        return prev + Math.random() * 15 + 5;
-      });
-    }, 150);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  // --- Jakarta Time Clock Effect ---
-  useEffect(() => {
-    const updateTime = () => {
-      const jakartaTime = new Date().toLocaleTimeString("en-US", {
-        timeZone: "Asia/Jakarta",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: true,
-      });
-      setCurrentTime(jakartaTime);
+    const updateProgress = () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      setProgress(scrollPercent);
     };
+
+    window.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
     
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
-    return () => clearInterval(interval);
+    return () => window.removeEventListener('scroll', updateProgress);
   }, []);
-
-  // --- Data ---
-  const navItems = [
-    { id: "about", label: "About", icon: User },
-    { id: "skills", label: "Skills", icon: Code },
-    { id: "experience", label: "Experience", icon: Briefcase },
-    { id: "projects", label: "Projects", icon: ExternalLink },
-    { id: "education", label: "Education", icon: GraduationCap },
-    { id: "certifications", label: "Certs", icon: FileBadge },
-    { id: "contact", label: "Contact", icon: Mail },
-  ];
-
-  const skillCategories: SkillCategory[] = [
-    {
-      category: "Core Skills",
-      items: [
-        { name: "People Analytics", level: 95 },
-        { name: "SQL & BigQuery", level: 92 },
-        { name: "Dashboard & Visualization", level: 90 },
-        { name: "Performance Management", level: 94 },
-      ],
-    },
-    {
-      category: "Data Analysis",
-      items: [
-        { name: "SQL Query Optimization", level: 95 },
-        { name: "PostgreSQL", level: 92 },
-        { name: "R Studio", level: 85 },
-        { name: "BigQuery", level: 95 },
-        { name: "Tableau / Looker", level: 88 },
-        { name: "DBeaver", level: 90 },
-      ],
-    },
-    {
-      category: "Human Resource",
-      items: [
-        { name: "Talent Management", level: 95 },
-        { name: "Performance Management", level: 94 },
-        { name: "Talent Acquisition", level: 85 },
-        { name: "HR Tools Development", level: 88 },
-        { name: "Lever ATS", level: 85 },
-      ],
-    },
-    {
-      category: "Languages",
-      items: [
-        { name: "English (Professional)", level: 90 },
-        { name: "Bahasa Indonesia (Native)", level: 100 },
-      ],
-    },
-    {
-      category: "Supporting Skills",
-      items: [
-        { name: "Usability Testing", level: 90 },
-        { name: "Figma", level: 85 },
-        { name: "Google Workspace", level: 95 },
-        { name: "Microsoft Office", level: 95 },
-      ],
-    },
-  ];
-
-  const experiences: ExperienceItem[] = [
-    {
-      role: "Performance Data Analyst",
-      company: "GoTo",
-      period: "January 2020 – Present",
-      summary: "Performance analytics, calibration insights, and HR dashboard development",
-      bullets: [
-        "Delivered performance insights and calibration analysis for HR leaders.",
-        "Developed dashboards and trackers using BigQuery and PostgreSQL.",
-        "Led enhancements in internal 360 performance tools through cross-functional collaboration.",
-        "Supported system reliability through continuous testing with engineering teams.",
-      ],
-    },
-    {
-      role: "Talent Acquisition Analyst",
-      company: "GoTo",
-      period: "June 2025 – Present",
-      summary: "Recruitment analytics and workforce planning",
-      bullets: [
-        "Supported recruitment analytics and dashboard reporting across hiring stages.",
-        "Streamlined SLA tracking to improve hiring process visibility.",
-        "Delivered hiring projections to support workforce planning decisions.",
-      ],
-    },
-    {
-      role: "Business Analyst",
-      company: "GoPay",
-      period: "January 2019 – December 2019",
-      summary: "Operational analytics, dashboarding, and fraud analysis",
-      bullets: [
-        "Provided data-driven insights to support operational decision-making.",
-        "Analyzed merchant acquisition, customer transactions, and fraud patterns.",
-        "Built real-time performance dashboards using BI tools.",
-        "Tracked merchant and transaction performance to identify anomalies.",
-        "Conducted fraud analysis by combining Salesforce and BigQuery data.",
-      ],
-    },
-    {
-      role: "Research Freelancer",
-      company: "GoPay",
-      period: "October 2018 – January 2019",
-      summary: "Market research and user acceptance testing",
-      bullets: [
-        "Conducted market research to understand user behavior and product acceptance.",
-        "Supported user acceptance testing to validate product usability and readiness.",
-        "Provided research insights to support product and business decisions.",
-      ],
-    },
-    {
-      role: "Competitive Intelligence",
-      company: "Uber",
-      period: "July 2017 – July 2018",
-      summary: "Market intelligence and competitor analysis",
-      bullets: [
-        "Performed market research and competitor benchmarking analysis.",
-        "Collected and analyzed competitor data to support strategic insights.",
-        "Delivered intelligence reports to support business and operational strategy.",
-      ],
-    },
-  ];
-
-  const projects: ProjectItem[] = [
-    {
-      name: "PAC Data Warehouse Project",
-      company: "GoTo HoldCo",
-      year: "2020",
-      summary: "Centralized HR data warehouse and enabled self-service analytics",
-      bullets: [
-        "Collaborated with People Analytics team to consolidate HR data into centralized BigQuery warehouse.",
-        "Ensured data sources were accurately recorded and consistently updated.",
-        "Enabled self-service analytics access for HR teams to perform independent analysis.",
-        "Improved data accessibility, integrity, and scalability for analytics and reporting.",
-      ],
-    },
-    {
-      name: "Merchant Acquisition and Fraud Transaction Analysis",
-      company: "GoTo GoPay",
-      year: "2019",
-      summary: "Fraud detection analysis and merchant transaction validation",
-      bullets: [
-        "Defined fraud detection metrics to evaluate merchant behavior across lifecycle.",
-        "Identified suspicious transaction patterns and abnormal merchant activity.",
-        "Improved sales incentive accuracy by validating eligible transactions.",
-        "Acted as first-level checker before escalation to Fraud and Risk team.",
-      ],
-    },
-  ];
-
-  const certifications: CertificationItem[] = [
-    {
-      title: "The Project Management Course: Beginner to PROject Manager",
-      issuer: "Udemy",
-      date: "August 2025",
-      description: "Certification covering project lifecycle, planning, execution, risk management, and stakeholder communication.",
-      link: "https://www.udemy.com/certificate/UC-8f286218-177b-4f0f-9348-4009768a0ab0/",
-      image: "https://udemy-certificate.s3.amazonaws.com/image/UC-8f286218-177b-4f0f-9348-4009768a0ab0.jpg?v=1756463361000"
-    },
-    {
-      title: "Global HR Management",
-      issuer: "Udemy",
-      date: "July 2025",
-      description: "Certification covering Navigating International Talent Acquisition, Engagement, and Retention Strategies.",
-      link: "https://www.udemy.com/certificate/UC-dd5c84ac-57a4-4f39-b9d8-84898d437ba5/",
-      image: "https://udemy-certificate.s3.amazonaws.com/image/UC-dd5c84ac-57a4-4f39-b9d8-84898d437ba5.jpg?v=1751636526000"
-    },
-    {
-      title: "BI-University Advanced Stream",
-      issuer: "GoTo Group",
-      date: "August 2019",
-      description: "Advanced Business Intelligence certification focused on data analysis, SQL, dashboarding, and analytics best practices.",
-    }
-  ];
-
-  // --- Effects ---
-  useEffect(() => {
-    const handleScroll = () => {
-      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = (window.scrollY / totalHeight) * 100;
-      setScrollProgress(progress);
-      setShowBackToTop(window.scrollY > 500);
-
-      const sections = document.querySelectorAll("section");
-      const scrollPosition = window.scrollY + 150;
-
-      sections.forEach((section) => {
-        const element = section as HTMLElement;
-        if (
-          scrollPosition >= element.offsetTop &&
-          scrollPosition < element.offsetTop + element.offsetHeight
-        ) {
-          setActiveSection(element.id);
-        }
-      });
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    trackEvent('click', 'button', 'Back to Top');
-  };
-
-  // --- Styles ---
-  const themeClasses = darkMode ? "bg-[#0a0a0a] text-white" : "bg-[#f8f9fa] text-gray-900";
-  const cardBaseClasses = darkMode
-    ? "bg-[#111] border border-white/10 hover:border-[#06B6D4]/50"
-    : "bg-white border border-gray-200 shadow-sm hover:border-[#0A4D68]";
-  const mutedText = darkMode ? "text-gray-400" : "text-gray-600";
-  const gradientText = "bg-clip-text text-transparent bg-gradient-to-r from-[#0A4D68] to-[#06B6D4]";
 
   return (
-    <div className={`${themeClasses} min-h-screen font-sans selection:bg-[#0A4D68] selection:text-white transition-colors duration-500`}>
-      
-      {/* GRAIN TEXTURE OVERLAY - Fixed full screen */}
+    <div 
+      className={`fixed top-0 left-0 w-full h-1 z-[60] ${isDark ? 'bg-slate-900/50' : 'bg-slate-200/50'}`}
+    >
       <div 
-        className="fixed inset-0 pointer-events-none z-[9999] opacity-[0.03]"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-        }}
+        className={`h-full transition-all duration-150 ease-out ${
+          isDark ? 'bg-sky-500 shadow-[0_0_10px_rgba(14,165,233,0.5)]' : 'bg-sky-600 shadow-[0_0_10px_rgba(14,165,233,0.3)]'
+        }`}
+        style={{ width: `${progress}%` }}
       />
+    </div>
+  );
+};
 
-      {/* LOADING PROGRESS BAR - Shows on initial load */}
-      <AnimatePresence>
-        {isLoading && (
-          <motion.div
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-[10000] bg-[#0a0a0a] flex flex-col items-center justify-center"
-          >
-            <div className="w-64 h-1 bg-gray-800 rounded-full overflow-hidden">
-              <motion.div
-                className="h-full bg-gradient-to-r from-[#0A4D68] to-[#06B6D4]"
-                initial={{ width: 0 }}
-                animate={{ width: `${Math.min(loadingProgress, 100)}%` }}
-                transition={{ duration: 0.1 }}
-              />
-            </div>
-            <p className="mt-4 text-sm text-gray-400 font-medium">
-              {Math.round(Math.min(loadingProgress, 100))}%
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
+// Liquid Glass Floating Menu - Always Visible
+const LiquidGlassMenu = ({ activeSection, onNavigate, isDark, onThemeToggle }) => {
+  const navItems = [
+    { id: 'about', label: 'About', icon: User },
+    { id: 'experience', label: 'Experience', icon: Briefcase },
+    { id: 'skills', label: 'Skills', icon: Code2 },
+    { id: 'projects', label: 'Projects', icon: FolderOpen },
+    { id: 'education', label: 'Education', icon: GraduationCap },
+    { id: 'certifications', label: 'Certifications', icon: Award },
+    { id: 'contact', label: 'Contact', icon: Mail }
+  ];
 
-      {/* SCROLL PROGRESS BAR */}
-      <div className="fixed top-0 left-0 w-full h-1 bg-gray-200/10 z-[100]">
-        <motion.div
-          className="h-full bg-gradient-to-r from-[#0A4D68] to-[#06B6D4]"
-          style={{ width: `${scrollProgress}%` }}
-        />
-      </div>
-
-      {/* Navigation */}
-      <motion.nav
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        className={`fixed top-4 left-0 right-0 z-50 flex justify-center px-4`}
+  return (
+    <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50">
+      <div 
+        className={`relative flex items-center gap-1 px-2 py-2 rounded-[2rem] transition-all duration-500 ${
+          isDark 
+            ? 'bg-slate-900/20 shadow-[0_8px_32px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] border border-white/10' 
+            : 'bg-white/25 shadow-[0_8px_32px_rgba(14,165,233,0.15),inset_0_1px_0_rgba(255,255,255,0.6)] border border-white/40'
+        } backdrop-blur-[20px] saturate-150`}
+        style={{
+          backdropFilter: 'blur(20px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(20px) saturate(180%)'
+        }}
       >
-        <div className="flex items-center gap-4">
-          <div className={`hidden md:flex items-center gap-1 p-1.5 rounded-full border backdrop-blur-md ${
-            darkMode ? "bg-black/40 border-white/10" : "bg-white/60 border-gray-200"
-          }`}>
-            {navItems.map((item) => (
-              <a
-                key={item.id}
-                href={`#${item.id}`}
-                onClick={() => trackEvent('click', 'nav', item.label)}
-                className={`relative px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
-                  activeSection === item.id
-                    ? "text-white"
-                    : darkMode ? "text-gray-400 hover:text-white" : "text-gray-600 hover:text-black"
-                }`}
-              >
-                {activeSection === item.id && (
-                  <motion.div
-                    layoutId="activeNav"
-                    className="absolute inset-0 bg-gradient-to-r from-[#0A4D68] to-[#06B6D4] rounded-full"
-                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                  />
-                )}
-                <span className="relative z-10 flex items-center gap-2">
-                  <item.icon size={14} />
-                  {item.label}
-                </span>
-              </a>
-            ))}
-          </div>
+        <div 
+          className={`absolute inset-0 rounded-[2rem] pointer-events-none ${
+            isDark 
+              ? 'bg-gradient-to-b from-white/5 to-transparent' 
+              : 'bg-gradient-to-b from-white/40 to-white/10'
+          }`}
+        />
 
-          {/* Jakarta Time Display */}
-          <div className={`hidden md:flex items-center gap-2 px-4 py-2 rounded-full border backdrop-blur-md ${
-            darkMode ? "bg-black/40 border-white/10 text-gray-300" : "bg-white/60 border-gray-200 text-gray-700"
-          }`}>
-            <span className="text-sm font-medium">Jakarta</span>
-            <span className="text-gray-500">•</span>
-            <span className="text-sm font-mono font-medium">{currentTime}</span>
-          </div>
-        </div>
+        {navItems.map(({ id, label, icon: Icon }) => {
+          const isActive = activeSection === id;
+          return (
+            <button
+              key={id}
+              onClick={() => {
+                onNavigate(id);
+                // Track navigation click in GA
+                if (window.gtag) {
+                  window.gtag('event', 'nav_click', {
+                    event_category: 'navigation',
+                    event_label: id
+                  });
+                }
+              }}
+              className={`relative group flex items-center justify-center w-11 h-11 rounded-full transition-all duration-300 ${
+                isActive
+                  ? isDark
+                    ? 'bg-sky-500/30 text-sky-300 shadow-[0_0_20px_rgba(14,165,233,0.4),inset_0_1px_0_rgba(255,255,255,0.2)]' 
+                    : 'bg-sky-500/20 text-sky-700 shadow-[0_0_20px_rgba(14,165,233,0.3),inset_0_1px_0_rgba(255,255,255,0.8)]'
+                  : isDark
+                    ? 'text-slate-400 hover:text-sky-300 hover:bg-white/5'
+                    : 'text-slate-600 hover:text-sky-600 hover:bg-white/30'
+              }`}
+              aria-label={label}
+            >
+              <Icon size={18} strokeWidth={isActive ? 2.5 : 2} />
+              
+              <span 
+                className={`absolute -bottom-10 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none ${
+                  isDark 
+                    ? 'bg-slate-900/90 text-slate-200 border border-slate-700' 
+                    : 'bg-white/90 text-slate-700 border border-slate-200'
+                } shadow-lg backdrop-blur-xl translate-y-2 group-hover:translate-y-0`}
+              >
+                {label}
+              </span>
+
+              {isActive && (
+                <span 
+                  className={`absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full ${
+                    isDark ? 'bg-sky-400' : 'bg-sky-600'
+                  } shadow-[0_0_10px_currentColor]`}
+                />
+              )}
+            </button>
+          );
+        })}
+
+        <div 
+          className={`w-px h-6 mx-1 ${
+            isDark ? 'bg-white/10' : 'bg-slate-400/20'
+          }`}
+        />
 
         <button
-          onClick={() => {
-            setMobileMenuOpen(!mobileMenuOpen);
-            trackEvent('click', 'button', 'Mobile Menu Toggle');
+          onClick={(e) => {
+            onThemeToggle(e);
+            // Track theme toggle in GA
+            if (window.gtag) {
+              window.gtag('event', 'theme_toggle', {
+                event_category: 'interaction',
+                event_label: isDark ? 'light' : 'dark'
+              });
+            }
           }}
-          className="md:hidden fixed top-6 left-6 z-[60] p-3 rounded-full backdrop-blur-lg border bg-white/10 border-white/20 hover:bg-white/20 transition"
-          aria-label="Toggle menu"
+          className={`relative flex items-center justify-center w-11 h-11 rounded-full transition-all duration-300 overflow-hidden ${
+            isDark 
+              ? 'text-amber-300 hover:bg-white/5' 
+              : 'text-sky-600 hover:bg-white/30'
+          }`}
+          aria-label="Toggle theme"
         >
-          {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
+          <div 
+            className={`absolute inset-0 rounded-full blur-md transition-opacity duration-500 ${
+              isDark ? 'bg-amber-500/20' : 'bg-sky-400/20'
+            }`}
+          />
+          <div className="relative z-10">
+            {isDark ? <Sun size={18} /> : <Moon size={18} />}
+          </div>
         </button>
-      </motion.nav>
+      </div>
+    </div>
+  );
+};
 
-      {mobileMenuOpen && (
-        <div className="md:hidden fixed top-20 left-6 right-6 z-[55] backdrop-blur-lg border border-white/20 bg-white/10 rounded-2xl p-4 flex flex-col gap-2">
-          {navItems.map((item) => (
-            <a
-              key={item.id}
-              href={`#${item.id}`}
-              onClick={() => {
-                setMobileMenuOpen(false);
-                trackEvent('click', 'mobile_nav', item.label);
-              }}
-              className={`capitalize px-3 py-2 rounded-lg transition ${
-                activeSection === item.id
-                  ? "bg-gradient-to-r from-[#0A4D68] to-[#06B6D4] text-white"
-                  : mutedText
-              }`}
-            >
-              {item.label}
-            </a>
-          ))}
+// Scroll Direction Indicator
+const ScrollIndicator = ({ direction, isDark, onClick, visible }) => (
+  <button
+    onClick={onClick}
+    className={`fixed right-6 bottom-6 z-40 w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500 ${
+      visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'
+    } ${
+      isDark 
+        ? 'bg-slate-900/30 text-sky-300 border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)]' 
+        : 'bg-white/30 text-sky-600 border border-white/50 shadow-[0_8px_32px_rgba(14,165,233,0.2)]'
+    } backdrop-blur-[20px] hover:scale-110 active:scale-95`}
+    style={{
+      backdropFilter: 'blur(20px) saturate(180%)',
+      WebkitBackdropFilter: 'blur(20px) saturate(180%)'
+    }}
+    aria-label={direction === 'up' ? 'Scroll to top' : 'Scroll to bottom'}
+  >
+    {direction === 'up' ? <ArrowUp size={20} /> : <ArrowDown size={20} />}
+  </button>
+);
+
+// Certificate Card Component - FIXED
+const CertificateCard = ({ title, provider, date, description, credentialLink, imageLink, isDark, noLink = false }) => {
+  const CardContent = () => (
+    <>
+      {/* Content Side */}
+      <div className="flex-1 flex flex-col">
+        <h3 className={`text-xl md:text-2xl font-bold mb-2 transition-colors duration-500 ${
+          isDark ? 'text-white' : 'text-slate-900'
+        }`}>{title}</h3>
+        
+        <p className={`text-base font-semibold mb-1 ${isDark ? 'text-sky-400' : 'text-sky-600'}`}>
+          {provider}
+        </p>
+        
+        <p className={`text-sm mb-4 transition-colors duration-500 ${
+          isDark ? 'text-slate-500' : 'text-slate-500'
+        }`}>
+          {date}
+        </p>
+        
+        <p className={`text-sm leading-relaxed mb-6 flex-grow transition-colors duration-500 ${
+          isDark ? 'text-slate-400' : 'text-slate-600'
+        }`}>
+          {description}
+        </p>
+        
+        {!noLink ? (
+          <div className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 w-fit ${
+            isDark 
+              ? 'bg-slate-800/50 text-sky-400 border border-sky-500/30 group-hover:bg-sky-500/20' 
+              : 'bg-sky-50 text-sky-700 border border-sky-200 group-hover:bg-sky-100'
+          }`}>
+            <ExternalLink size={16} />
+            Show Credential
+          </div>
+        ) : (
+          <div className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold w-fit ${
+            isDark 
+              ? 'bg-slate-800/30 text-slate-500 border border-slate-700/50' 
+              : 'bg-slate-100 text-slate-500 border border-slate-200'
+          }`}>
+            <Award size={16} />
+            Certificate Available
+          </div>
+        )}
+      </div>
+
+      {/* Image Side */}
+      {imageLink ? (
+        <div className={`w-full md:w-48 h-32 md:h-auto flex-shrink-0 rounded-2xl overflow-hidden transition-transform duration-500 group-hover:scale-105 ${
+          isDark ? 'bg-slate-800/50' : 'bg-slate-100'
+        }`}>
+          <img 
+            src={imageLink} 
+            alt={title}
+            className="w-full h-full object-cover object-top"
+          />
+        </div>
+      ) : (
+        <div className={`w-full md:w-48 h-32 md:h-auto flex-shrink-0 rounded-2xl flex items-center justify-center transition-transform duration-500 group-hover:scale-105 ${
+          isDark ? 'bg-slate-800/50' : 'bg-sky-100'
+        }`}>
+          <Award size={48} className={isDark ? 'text-sky-400' : 'text-sky-600'} />
         </div>
       )}
+    </>
+  );
 
-      <button
-        onClick={() => {
-          setDarkMode(!darkMode);
-          trackEvent('click', 'button', `Theme Toggle ${!darkMode ? 'Dark' : 'Light'}`);
-        }}
-        className={`fixed bottom-6 right-6 z-50 p-3 rounded-full backdrop-blur-md border transition-all hover:scale-110 ${
-          darkMode ? "bg-white/10 border-white/20 text-[#06B6D4]" : "bg-white border-gray-200 text-[#0A4D68] shadow-lg"
-        }`}
-      >
-        {darkMode ? <Sun size={20} /> : <Moon size={20} />}
-      </button>
+  const cardClassName = `group flex flex-col md:flex-row gap-6 p-6 rounded-3xl transition-all duration-500 hover:scale-[1.02] ${
+    isDark 
+      ? 'bg-slate-900/30 border border-slate-800/50 hover:border-sky-500/30' 
+      : 'bg-white/60 border border-white/60 hover:border-sky-300/50 hover:shadow-lg'
+  } backdrop-blur-xl ${noLink ? 'cursor-default' : 'cursor-pointer'}`;
 
-      <AnimatePresence>
-        {showBackToTop && (
-          <motion.button
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            onClick={scrollToTop}
-            className={`fixed bottom-20 right-6 z-50 p-3 rounded-full backdrop-blur-md border transition-all hover:scale-110 ${
-              darkMode 
-                ? "bg-gradient-to-r from-[#0A4D68] to-[#06B6D4] border-transparent text-white shadow-lg shadow-[#06B6D4]/25" 
-                : "bg-gradient-to-r from-[#0A4D68] to-[#06B6D4] border-transparent text-white shadow-lg"
-            }`}
-            aria-label="Back to top"
-          >
-            <ArrowUp size={20} />
-          </motion.button>
-        )}
-      </AnimatePresence>
+  const cardStyle = {
+    backdropFilter: 'blur(20px) saturate(180%)',
+    WebkitBackdropFilter: 'blur(20px) saturate(180%)'
+  };
 
-      {/* Hero Section */}
-      <section id="about" className="min-h-screen flex items-center justify-center relative px-6 pt-20">
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className={`absolute top-1/4 left-1/4 w-96 h-96 rounded-full blur-[120px] opacity-20 ${
-            darkMode ? "bg-[#0A4D68]" : "bg-[#0A4D68]"
-          }`} />
-          <div className={`absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full blur-[120px] opacity-20 ${
-            darkMode ? "bg-[#06B6D4]" : "bg-[#06B6D4]"
-          }`} />
-        </div>
+  if (noLink) {
+    return (
+      <div className={cardClassName} style={cardStyle}>
+        <CardContent />
+      </div>
+    );
+  }
 
-        <div className="max-w-4xl mx-auto text-center relative z-10">
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.8 }}
-            className="mb-8 relative inline-block"
-          >
-            <div className="w-32 h-32 md:w-40 md:h-40 rounded-full p-1 bg-gradient-to-tr from-[#0A4D68] to-[#06B6D4]">
-              <img
-                src="https://res.cloudinary.com/dqszs1x5y/image/upload/v1771588295/WhatsApp_Image_2026-02-20_at_6.49.42_PM_nvzmpy.jpg"
-                alt="Achmad Faiz"
-                className="w-full h-full rounded-full object-cover border-4 border-black"
-              />
-            </div>
-          </motion.div>
+  return (
+    <a 
+      href={credentialLink}
+      target="_blank"
+      rel="noopener noreferrer"
+      onClick={() => {
+        if (window.gtag) {
+          window.gtag('event', 'certificate_click', {
+            event_category: 'engagement',
+            event_label: title
+          });
+        }
+      }}
+      className={cardClassName}
+      style={cardStyle}
+    >
+      <CardContent />
+    </a>
+  );
+};
 
-          <motion.h1
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="text-5xl md:text-7xl font-bold mb-6 tracking-tight"
-          >
-            Achmad <span className={gradientText}>Faiz</span>
-          </motion.h1>
+// Main App Component
+const Portfolio = () => {
+  const { isDark, toggleTheme } = React.useContext(ThemeContext);
+  const [activeSection, setActiveSection] = useState('hero');
+  const [showScrollIndicator, setShowScrollIndicator] = useState(false);
+  const [scrollDirection, setScrollDirection] = useState('down');
+  const lastScrollY = useRef(0);
+  const isAtBottom = useRef(false);
 
-          <motion.p
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            className={`text-xl md:text-2xl mb-8 ${mutedText}`}
-          >
-            Performance Data Analyst & People Analytics
-          </motion.p>
+  // Initialize Google Analytics
+  useGoogleAnalytics();
 
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="flex flex-wrap justify-center gap-3 mb-12"
-          >
-            {["SQL", "BigQuery", "Tableau", "HR Strategy", "R Studio", "Performance Management"].map((tag) => (
-              <span key={tag} className={`px-4 py-2 rounded-full text-sm font-medium border ${
-                darkMode ? "bg-white/5 border-white/10" : "bg-white border-gray-200"
-              }`}>
-                {tag}
-              </span>
-            ))}
-          </motion.div>
+  const sectionRefs = {
+    hero: useRef(null),
+    about: useRef(null),
+    experience: useRef(null),
+    skills: useRef(null),
+    projects: useRef(null),
+    education: useRef(null),
+    certifications: useRef(null),
+    contact: useRef(null)
+  };
 
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center"
-          >
-            <a
-              href="#contact"
-              onClick={() => trackEvent('click', 'button', 'Get in Touch')}
-              className="px-8 py-4 rounded-full bg-gradient-to-r from-[#0A4D68] to-[#06B6D4] text-white font-bold hover:shadow-lg hover:shadow-[#06B6D4]/25 transition-all hover:-translate-y-1"
-            >
-              Get in Touch
-            </a>
-            <a
-              href="#experience"
-              onClick={() => trackEvent('click', 'button', 'View Experience')}
-              className={`px-8 py-4 rounded-full font-bold border transition-all hover:-translate-y-1 ${
-                darkMode ? "border-white/20 hover:bg-white/10" : "border-gray-300 hover:bg-gray-100"
-              }`}
-            >
-              View Experience
-            </a>
-          </motion.div>
-        </div>
+  useEffect(() => {
+    const handleIntersection = (entries) => {
+      const visibleEntries = entries.filter(entry => entry.isIntersecting);
+      if (visibleEntries.length > 0) {
+        const mostVisible = visibleEntries.sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        setActiveSection(mostVisible.target.id);
         
-        <motion.div 
-          animate={{ y: [0, 10, 0] }}
-          transition={{ repeat: Infinity, duration: 2 }}
-          className="absolute bottom-10 left-1/2 -translate-x-1/2"
+        // Track section view in GA
+        if (window.gtag && mostVisible.intersectionRatio > 0.5) {
+          window.gtag('event', 'section_view', {
+            event_category: 'engagement',
+            event_label: mostVisible.target.id
+          });
+        }
+      }
+    };
+
+    const observer = new IntersectionObserver(handleIntersection, {
+      root: null,
+      rootMargin: '-10% 0px -40% 0px',
+      threshold: [0, 0.25, 0.5, 0.75, 1]
+    });
+
+    Object.values(sectionRefs).forEach(ref => {
+      if (ref.current) {
+        observer.observe(ref.current);
+      }
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      const maxScroll = documentHeight - windowHeight;
+      
+      const atBottom = currentScrollY >= maxScroll - 100;
+      isAtBottom.current = atBottom;
+      
+      if (currentScrollY > lastScrollY.current + 5) {
+        if (atBottom) {
+          setScrollDirection('up');
+        } else {
+          setScrollDirection('down');
+        }
+      } else if (currentScrollY < lastScrollY.current - 5) {
+        setScrollDirection('up');
+      }
+      
+      setShowScrollIndicator(currentScrollY > 100);
+      lastScrollY.current = currentScrollY;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToSection = (sectionId) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      const navHeight = 100;
+      const elementPosition = element.getBoundingClientRect().top + window.scrollY;
+      window.scrollTo({
+        top: elementPosition - navHeight,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Track scroll to top in GA
+    if (window.gtag) {
+      window.gtag('event', 'scroll_to_top', {
+        event_category: 'navigation'
+      });
+    }
+  };
+
+  const scrollToBottom = () => {
+    window.scrollTo({ 
+      top: document.documentElement.scrollHeight, 
+      behavior: 'smooth' 
+    });
+    // Track scroll to bottom in GA
+    if (window.gtag) {
+      window.gtag('event', 'scroll_to_bottom', {
+        event_category: 'navigation'
+      });
+    }
+  };
+
+  const handleScrollIndicatorClick = () => {
+    if (scrollDirection === 'up') {
+      scrollToTop();
+    } else {
+      scrollToBottom();
+    }
+  };
+
+  return (
+    <div className={`min-h-screen transition-colors duration-700 ${isDark ? 'bg-slate-950' : 'bg-slate-50'}`}>
+      {/* Scroll Progress Bar */}
+      <ScrollProgressBar isDark={isDark} />
+      
+      <div className={`fixed inset-0 pointer-events-none transition-opacity duration-700 ${
+        isDark 
+          ? 'bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(14,165,233,0.15),transparent),radial-gradient(ellipse_60%_40%_at_50%_100%,rgba(6,182,212,0.1),transparent),radial-gradient(circle_at_50%_50%,rgba(15,23,42,0.8)_0%,transparent_100%)]'
+          : 'bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(14,165,233,0.15),transparent),radial-gradient(ellipse_60%_40%_at_50%_100%,rgba(6,182,212,0.1),transparent),radial-gradient(circle_at_50%_50%,rgba(224,242,254,0.4)_0%,transparent_70%)]'
+      }`} />
+
+      <LiquidGlassMenu 
+        activeSection={activeSection}
+        onNavigate={scrollToSection}
+        isDark={isDark}
+        onThemeToggle={toggleTheme}
+      />
+
+      <ScrollIndicator 
+        direction={scrollDirection}
+        isDark={isDark}
+        onClick={handleScrollIndicatorClick}
+        visible={showScrollIndicator}
+      />
+
+      <main className="relative z-10 pt-24">
+        {/* Hero Section */}
+        <section 
+          id="hero" 
+          ref={sectionRefs.hero}
+          className="min-h-screen flex flex-col justify-center items-center px-6 py-20 -mt-24"
         >
-          <ChevronDown className={mutedText} />
-        </motion.div>
-      </section>
-
-      {/* Skills Section */}
-      <section id="skills" className="py-24 px-6 max-w-6xl mx-auto">
-        <SectionHeading darkMode={darkMode}>Skills</SectionHeading>
-        
-        <div className="flex flex-wrap justify-center gap-2 mb-12">
-          {skillCategories.map((cat) => (
-            <button
-              key={cat.category}
-              onClick={() => {
-                setActiveSkillTab(cat.category);
-                trackEvent('click', 'skill_tab', cat.category);
-              }}
-              className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
-                activeSkillTab === cat.category
-                  ? "bg-[#0A4D68] text-white shadow-lg shadow-[#06B6D4]/30"
-                  : darkMode ? "bg-white/5 text-gray-400 hover:bg-white/10" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-              }`}
-            >
-              {cat.category}
-            </button>
-          ))}
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-8">
-          <AnimatePresence mode="wait">
-            {skillCategories
-              .filter((cat) => cat.category === activeSkillTab)
-              .map((category) => (
-                <React.Fragment key={category.category}>
-                  {category.items.map((skill, index) => (
-                    <motion.div
-                      key={skill.name}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 20 }}
-                      transition={{ delay: index * 0.1 }}
-                      className="space-y-2"
-                    >
-                      <div className="flex justify-between text-sm font-medium">
-                        <span>{skill.name}</span>
-                        <span className={mutedText}>{skill.level}%</span>
-                      </div>
-                      <div className={`h-2 w-full rounded-full overflow-hidden ${darkMode ? "bg-gray-800" : "bg-gray-200"}`}>
-                        <motion.div
-                          initial={{ width: 0 }}
-                          whileInView={{ width: `${skill.level}%` }}
-                          viewport={{ once: true }}
-                          transition={{ duration: 1, delay: 0.2 }}
-                          className="h-full rounded-full bg-gradient-to-r from-[#0A4D68] to-[#06B6D4]"
-                        />
-                      </div>
-                    </motion.div>
-                  ))}
-                </React.Fragment>
-              ))}
-          </AnimatePresence>
-        </div>
-      </section>
-
-      {/* Experience Section */}
-      <section id="experience" className="py-16 sm:py-24 px-4 sm:px-6 max-w-4xl mx-auto">
-        <SectionHeading darkMode={darkMode}>Career Journey</SectionHeading>
-
-        <div className="relative border-l border-white/20 ml-4 space-y-10">
-          {experiences.map((exp, index) => (
-            <div key={`${exp.company}-${exp.role}`} className="relative">
-              <div className="absolute -left-[9px] top-2 w-4 h-4 rounded-full bg-gradient-to-r from-[#0A4D68] to-[#06B6D4]" />
-
-              <div
-                onClick={() => {
-                  setExpandedExp(expandedExp === index ? null : index);
-                  trackEvent('click', 'experience', `${exp.role} - ${exp.company}`);
-                }}
-                className={`ml-6 border p-4 sm:p-6 rounded-xl transition cursor-pointer ${cardBaseClasses} ${
-                  expandedExp === index
-                    ? "border-[#06B6D4] shadow-lg shadow-[#06B6D4]/10 ring-1 ring-[#06B6D4]/40"
-                    : "hover:border-[#06B6D4]"
-                }`}
+          <div className="max-w-4xl mx-auto text-center">
+            <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-6 transition-colors duration-500 ${
+              isDark ? 'bg-sky-500/10 text-sky-400 border border-sky-500/20' : 'bg-sky-100 text-sky-700 border border-sky-200'
+            }`}>
+              <Database size={16} />
+              Data Analyst & HR Analytics
+            </div>
+            
+            <h1 className={`text-5xl md:text-7xl font-bold tracking-tight mb-6 transition-colors duration-500 ${
+              isDark ? 'text-white' : 'text-slate-900'
+            }`}>
+              Achmad{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-500 to-cyan-500">
+                Faiz
+              </span>
+            </h1>
+            
+            <p className={`text-xl md:text-2xl max-w-2xl mx-auto mb-8 leading-relaxed transition-colors duration-500 ${
+              isDark ? 'text-slate-400' : 'text-slate-600'
+            }`}>
+              Transforming complex data into strategic insights for human resources and business intelligence
+            </p>
+            
+            <div className={`flex items-center justify-center gap-2 mb-12 transition-colors duration-500 ${
+              isDark ? 'text-slate-500' : 'text-slate-500'
+            }`}>
+              <MapPin size={18} />
+              <span>Jakarta Selatan, Indonesia</span>
+            </div>
+            
+            <div className="flex flex-wrap justify-center gap-4">
+              <button 
+                onClick={() => scrollToSection('experience')}
+                className={`px-8 py-4 rounded-full font-semibold transition-all duration-300 flex items-center gap-2 ${
+                  isDark 
+                    ? 'bg-sky-500 hover:bg-sky-400 text-white shadow-[0_0_30px_rgba(14,165,233,0.3)]' 
+                    : 'bg-sky-600 hover:bg-sky-500 text-white shadow-[0_0_30px_rgba(14,165,233,0.3)]'
+                } hover:scale-105 active:scale-95`}
               >
-                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-1">
-                  <h3 className="text-lg sm:text-xl font-semibold">{exp.role}</h3>
-                  <span className="text-xs sm:text-sm text-gray-400">{exp.period}</span>
-                </div>
+                View Experience
+                <ChevronRight size={20} />
+              </button>
+              <button 
+                onClick={() => scrollToSection('contact')}
+                className={`px-8 py-4 rounded-full font-semibold transition-all duration-300 border-2 ${
+                  isDark 
+                    ? 'border-slate-700 text-slate-300 hover:border-sky-500 hover:text-sky-400' 
+                    : 'border-slate-300 text-slate-700 hover:border-sky-500 hover:text-sky-600'
+                } hover:scale-105 active:scale-95`}
+              >
+                Get in Touch
+              </button>
+            </div>
+          </div>
+        </section>
 
-                <p className="text-[#06B6D4] mb-2">{exp.company}</p>
+        {/* About Section */}
+        <section 
+          id="about" 
+          ref={sectionRefs.about}
+          className="py-24 px-6 scroll-mt-32"
+        >
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-16">
+              <span className={`text-sm font-semibold tracking-wider uppercase mb-2 block transition-colors duration-500 ${
+                isDark ? 'text-sky-400' : 'text-sky-600'
+              }`}>About</span>
+              <h2 className={`text-4xl md:text-5xl font-bold mb-4 transition-colors duration-500 ${
+                isDark ? 'text-white' : 'text-slate-900'
+              }`}>Bridging Data and People</h2>
+              <p className={`text-lg max-w-2xl mx-auto transition-colors duration-500 ${
+                isDark ? 'text-slate-400' : 'text-slate-600'
+              }`}>Combining technical expertise with human resources domain knowledge</p>
+            </div>
 
-                <p className={mutedText}>{exp.summary}</p>
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              <div className={`space-y-6 text-lg leading-relaxed transition-colors duration-500 ${
+                isDark ? 'text-slate-300' : 'text-slate-600'
+              }`}>
+                <p>
+                  I'm a Performance Data Analyst and Talent Acquisition Analyst at GOTO (Gojek Tokopedia), 
+                  where I specialize in turning complex HR data into actionable insights.
+                </p>
+                <p>
+                  With a foundation in Informatics Engineering from Universitas Sumatera Utara, 
+                  I bring a technical perspective to people analytics, building scalable data infrastructure 
+                  and intuitive dashboards.
+                </p>
+              </div>
 
-                {expandedExp === index && (
-                  <ul className={`mt-4 space-y-2 ${mutedText}`}>
-                    {exp.bullets.map((bullet, bulletIndex) => (
-                      <li key={bulletIndex} className="flex gap-2 items-start">
-                        <span className="text-[#06B6D4] mt-1">•</span>
-                        <span>{bullet}</span>
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  { num: '7+', label: 'Years Experience' },
+                  { num: '10+', label: 'Data Tools' },
+                  { num: '5', label: 'Major Projects' },
+                  { num: '4', label: 'Companies' }
+                ].map((stat, i) => (
+                  <div 
+                    key={i}
+                    className={`p-6 rounded-3xl transition-all duration-500 hover:scale-105 ${
+                      isDark 
+                        ? 'bg-slate-900/30 border border-slate-800/50 hover:border-sky-500/30' 
+                        : 'bg-white/40 border border-white/60 hover:border-sky-300/50'
+                    } backdrop-blur-xl`}
+                    style={{
+                      backdropFilter: 'blur(20px) saturate(180%)',
+                      WebkitBackdropFilter: 'blur(20px) saturate(180%)'
+                    }}
+                  >
+                    <div className={`text-4xl font-bold mb-2 transition-colors duration-500 ${
+                      isDark ? 'text-sky-400' : 'text-sky-600'
+                    }`}>{stat.num}</div>
+                    <div className={`text-sm font-medium transition-colors duration-500 ${
+                      isDark ? 'text-slate-500' : 'text-slate-500'
+                    }`}>{stat.label}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Experience Section */}
+        <section 
+          id="experience" 
+          ref={sectionRefs.experience}
+          className="py-24 px-6 scroll-mt-32"
+        >
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-16">
+              <span className={`text-sm font-semibold tracking-wider uppercase mb-2 block transition-colors duration-500 ${
+                isDark ? 'text-sky-400' : 'text-sky-600'
+              }`}>Experience</span>
+              <h2 className={`text-4xl md:text-5xl font-bold mb-4 transition-colors duration-500 ${
+                isDark ? 'text-white' : 'text-slate-900'
+              }`}>Professional Journey</h2>
+            </div>
+
+            <div className="space-y-6">
+              {[
+                {
+                  title: 'Talent Acquisition Analyst',
+                  company: 'GOTO (HoldCo)',
+                  date: 'Jun 2025 — Present',
+                  icon: Users,
+                  points: [
+                    'Supporting recruitment analytics and dashboard reporting across hiring stages in Lever ATS',
+                    'Streamlined SLA tracking and delivered hiring projections to support workforce planning',
+                    'Built automated reporting solutions for talent acquisition metrics'
+                  ]
+                },
+                {
+                  title: 'Performance Data Analyst',
+                  company: 'GOTO (HoldCo)',
+                  date: 'Jan 2020 — Present',
+                  icon: BarChart3,
+                  points: [
+                    'Delivered performance insights and calibration analysis for HR leaders using BigQuery and PostgreSQL',
+                    'Developed interactive dashboards and trackers for HR analytics',
+                    'Led enhancements in internal 360° tools through cross-functional collaboration',
+                    'Supported system reliability through continuous testing with engineering teams'
+                  ]
+                },
+                {
+                  title: 'Business Analyst',
+                  company: 'GOTO (GoPay)',
+                  date: 'Jan 2019 — Dec 2019',
+                  icon: Database,
+                  points: [
+                    'Analyzed key metrics: merchant acquisition, customer transactions, and fraud patterns',
+                    'Built real-time performance dashboards using Metabase and Google Data Studio',
+                    'Tracked Point of Interest (POI) performance to identify trends and anomalies',
+                    'Conducted fraud analysis combining Salesforce and BigQuery data'
+                  ]
+                },
+                {
+                  title: 'Research Freelancer',
+                  company: 'GoPay',
+                  date: 'Oct 2018 — Jan 2019',
+                  icon: Search,
+                  points: [
+                    'Conducted market research to understand user behavior and product acceptance',
+                    'Supported user acceptance testing to validate product usability and readiness',
+                    'Provided research insights to support product and business decisions'
+                  ]
+                },
+                {
+                  title: 'Competitive Intelligence',
+                  company: 'Uber',
+                  date: 'Jul 2017 — Jul 2018',
+                  icon: Target,
+                  points: [
+                    'Performed market research and competitor benchmarking analysis',
+                    'Collected and analyzed competitor data to support strategic insights',
+                    'Delivered intelligence reports to support business and operational strategy'
+                  ]
+                }
+              ].map((job, i) => (
+                <div 
+                  key={i}
+                  className={`p-8 rounded-3xl transition-all duration-500 hover:scale-[1.02] ${
+                    isDark 
+                      ? 'bg-slate-900/30 border border-slate-800/50 hover:border-sky-500/20' 
+                      : 'bg-white/40 border border-white/60 hover:border-sky-300/50'
+                  } backdrop-blur-xl cursor-pointer`}
+                  style={{
+                    backdropFilter: 'blur(20px) saturate(180%)',
+                    WebkitBackdropFilter: 'blur(20px) saturate(180%)'
+                  }}
+                >
+                  <div className="flex flex-wrap justify-between items-start gap-4 mb-6">
+                    <div className="flex items-start gap-4">
+                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 ${
+                        isDark ? 'bg-sky-500/20 text-sky-400' : 'bg-sky-100 text-sky-600'
+                      }`}>
+                        <job.icon size={24} />
+                      </div>
+                      <div>
+                        <h3 className={`text-2xl font-bold mb-1 transition-colors duration-500 ${
+                          isDark ? 'text-white' : 'text-slate-900'
+                        }`}>{job.title}</h3>
+                        <div className={isDark ? 'text-sky-400' : 'text-sky-600'}>{job.company}</div>
+                      </div>
+                    </div>
+                    <span className={`px-4 py-2 rounded-full text-sm font-medium ${
+                      isDark ? 'bg-slate-800/50 text-slate-400 border border-slate-700/50' : 'bg-sky-50/50 text-sky-700 border border-sky-200/50'
+                    }`}>{job.date}</span>
+                  </div>
+                  <ul className="space-y-3 ml-16">
+                    {job.points.map((point, j) => (
+                      <li 
+                        key={j} 
+                        className={`flex items-start gap-3 transition-colors duration-500 ${
+                          isDark ? 'text-slate-400' : 'text-slate-600'
+                        }`}
+                      >
+                        <span className={isDark ? 'text-sky-500' : 'text-sky-500'}>•</span>
+                        {point}
                       </li>
                     ))}
                   </ul>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Projects Section */}
-      <section id="projects" className="py-16 sm:py-24 px-4 sm:px-6 max-w-4xl mx-auto">
-        <SectionHeading darkMode={darkMode}>Featured Projects</SectionHeading>
-        <div className="space-y-6">
-          {projects.map((project, index) => (
-            <div
-              key={project.name}
-              onClick={() => {
-                setExpandedProj(expandedProj === index ? null : index);
-                trackEvent('click', 'project', project.name);
-              }}
-              className={`border p-4 sm:p-6 rounded-xl transition cursor-pointer ${cardBaseClasses} ${
-                expandedProj === index
-                  ? "border-[#06B6D4] shadow-lg shadow-[#06B6D4]/10"
-                  : "hover:border-[#06B6D4]"
-              }`}
-            >
-              <h3 className="text-xl font-semibold">{project.name}</h3>
-              <p className="text-[#06B6D4]">{project.company}</p>
-              <p className="text-sm text-gray-400 mb-2">{project.year}</p>
-              <p className={mutedText}>{project.summary}</p>
-
-              {expandedProj === index && (
-                <ul className={`mt-4 space-y-2 ${mutedText}`}>
-                  {project.bullets.map((bullet, bulletIndex) => (
-                    <li key={bulletIndex} className="flex gap-2 items-start">
-                      <span className="text-[#06B6D4] mt-1">•</span>
-                      <span>{bullet}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Education Section */}
-      <section id="education" className="py-16 sm:py-24 px-4 sm:px-6 max-w-4xl mx-auto">
-        <SectionHeading darkMode={darkMode}>Education</SectionHeading>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          className={`${cardBaseClasses} border p-4 sm:p-6 rounded-xl flex flex-col md:flex-row items-center gap-6 text-center md:text-left`}
-        >
-          <div className="w-24 h-24 md:w-28 md:h-28 flex-shrink-0 bg-white rounded-full p-2 flex items-center justify-center shadow-lg">
-            <img
-              src="https://res.cloudinary.com/dqszs1x5y/image/upload/v1771670628/Logo_of_North_Sumatra_University.svg_rs9pkq.png"
-              alt="Universitas Sumatera Utara Logo"
-              className="w-full h-full object-contain rounded-full"
-            />
-          </div>
-          
-          <div className="flex-1">
-            <h3 className="text-xl font-semibold">Universitas Sumatera Utara</h3>
-            <p className="text-[#06B6D4]">Diploma in Informatics Engineering</p>
-            <p className="text-sm text-gray-400">2013 – 2016</p>
-            <p className={`mt-2 ${mutedText}`}>GPA: 3.30</p>
-          </div>
-        </motion.div>
-      </section>
-
-      {/* Certifications Section */}
-      <section id="certifications" className="py-24 px-6 max-w-5xl mx-auto">
-        <SectionHeading darkMode={darkMode}>Certifications</SectionHeading>
-        
-        <div className="space-y-6">
-          {certifications.map((cert, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              className={`${cardBaseClasses} p-6 rounded-2xl transition-all duration-300 hover:border-[#06B6D4]/50`}
-            >
-              <div className="flex flex-col md:flex-row gap-6">
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold mb-2">{cert.title}</h3>
-                  
-                  <div className="mb-3">
-                    <p className="text-[#06B6D4] font-medium">{cert.issuer}</p>
-                    <p className="text-sm text-gray-400">{cert.date}</p>
-                  </div>
-                  
-                  <p className={`mb-4 ${mutedText}`}>{cert.description}</p>
-                  
-                  {cert.link && (
-                    <a
-                      href={cert.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => trackEvent('click', 'certificate', cert.title)}
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#06B6D4] text-[#06B6D4] hover:bg-[#06B6D4] hover:text-white transition-all text-sm font-medium"
-                    >
-                      <ExternalLink size={14} />
-                      Show Credential
-                    </a>
-                  )}
                 </div>
+              ))}
+            </div>
+          </div>
+        </section>
 
-                {cert.image && (
-                  <a 
-                    href={cert.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => trackEvent('click', 'certificate_image', cert.title)}
-                    className="block w-full md:w-48 h-32 rounded-lg overflow-hidden border border-white/10 hover:scale-105 transition-transform flex-shrink-0"
-                  >
-                    <img
-                      src={cert.image}
-                      alt={`${cert.title} Certificate`}
-                      className="w-full h-full object-cover"
-                    />
-                  </a>
-                )}
+        {/* Skills Section */}
+        <section 
+          id="skills" 
+          ref={sectionRefs.skills}
+          className="py-24 px-6 scroll-mt-32"
+        >
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-16">
+              <span className={`text-sm font-semibold tracking-wider uppercase mb-2 block transition-colors duration-500 ${
+                isDark ? 'text-sky-400' : 'text-sky-600'
+              }`}>Expertise</span>
+              <h2 className={`text-4xl md:text-5xl font-bold mb-4 transition-colors duration-500 ${
+                isDark ? 'text-white' : 'text-slate-900'
+              }`}>Skills & Technologies</h2>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[
+                { 
+                  icon: Database, 
+                  title: 'Data Analysis', 
+                  skills: ['SQL Query', 'PostgreSQL', 'BigQuery', 'R Studio', 'DBeaver', 'Google Sheets'] 
+                },
+                { 
+                  icon: BarChart3, 
+                  title: 'Visualization', 
+                  skills: ['Looker', 'Tableau', 'Metabase', 'Google Data Studio'] 
+                },
+                { 
+                  icon: Users, 
+                  title: 'HR Tech', 
+                  skills: ['Performance Management', 'Talent Management', 'Lever ATS', 'HR Tools Development'] 
+                },
+                { 
+                  icon: Code2, 
+                  title: 'Productivity', 
+                  skills: ['Figma', 'MS Office', 'Google Workspace', 'Salesforce'] 
+                },
+                { 
+                  icon: Briefcase, 
+                  title: 'Methodologies', 
+                  skills: ['Project Management', 'Stakeholder Management', 'Product Management', 'Usability Testing'] 
+                },
+                { 
+                  icon: Award, 
+                  title: 'Languages', 
+                  skills: ['English', 'Bahasa Indonesia'] 
+                }
+              ].map((category, i) => (
+                <div 
+                  key={i}
+                  className={`p-6 rounded-3xl transition-all duration-500 hover:scale-105 ${
+                    isDark 
+                      ? 'bg-slate-900/30 border border-slate-800/50 hover:border-sky-500/20' 
+                      : 'bg-white/40 border border-white/60 hover:border-sky-300/50'
+                  } backdrop-blur-xl`}
+                  style={{
+                    backdropFilter: 'blur(20px) saturate(180%)',
+                    WebkitBackdropFilter: 'blur(20px) saturate(180%)'
+                  }}
+                >
+                  <div className="flex items-center gap-3 mb-4">
+                    <category.icon className={isDark ? 'text-sky-400' : 'text-sky-600'} size={24} />
+                    <h3 className={`text-lg font-bold transition-colors duration-500 ${
+                      isDark ? 'text-white' : 'text-slate-900'
+                    }`}>{category.title}</h3>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {category.skills.map((skill, j) => (
+                      <span 
+                        key={j}
+                        className={`px-3 py-1 rounded-full text-sm font-medium transition-all duration-300 hover:scale-110 ${
+                          isDark 
+                            ? 'bg-slate-800/50 text-slate-300 border border-slate-700/50 hover:border-sky-500/30' 
+                            : 'bg-sky-50/50 text-sky-700 border border-sky-200/50 hover:border-sky-400/50'
+                        }`}
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Projects Section */}
+        <section 
+          id="projects" 
+          ref={sectionRefs.projects}
+          className="py-24 px-6 scroll-mt-32"
+        >
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-16">
+              <span className={`text-sm font-semibold tracking-wider uppercase mb-2 block transition-colors duration-500 ${
+                isDark ? 'text-sky-400' : 'text-sky-600'
+              }`}>Work</span>
+              <h2 className={`text-4xl md:text-5xl font-bold mb-4 transition-colors duration-500 ${
+                isDark ? 'text-white' : 'text-slate-900'
+              }`}>Featured Projects</h2>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[
+                {
+                  company: 'GOTO HoldCo',
+                  title: 'Project PAC Data Warehouse',
+                  desc: 'Centralized HR data warehouse initiative consolidating people analytics into BigQuery. Enabled self-service data access and built scalable infrastructure.',
+                  tags: ['BigQuery', 'Data Warehouse', 'ETL']
+                },
+                {
+                  company: 'GOTO GoPay',
+                  title: 'Merchant Fraud Detection',
+                  desc: 'Defined fraud detection metrics analyzing merchant behavior from acquisition to transaction. Improved sales incentive accuracy by validating transactions.',
+                  tags: ['Fraud Analysis', 'Salesforce', 'Risk Management']
+                },
+                {
+                  company: 'GOTO HoldCo',
+                  title: '360° Performance Tools',
+                  desc: 'Led enhancement of internal performance evaluation tools through cross-functional collaboration. Established continuous testing protocols.',
+                  tags: ['Product Management', 'HR Tech', 'Agile']
+                }
+              ].map((project, i) => (
+                <div 
+                  key={i}
+                  className={`p-8 rounded-3xl transition-all duration-500 hover:scale-105 cursor-pointer ${
+                    isDark 
+                      ? 'bg-slate-900/30 border border-slate-800/50 hover:border-sky-500/20 hover:shadow-[0_0_40px_rgba(14,165,233,0.15)]' 
+                      : 'bg-white/40 border border-white/60 hover:border-sky-300/50 hover:shadow-[0_0_40px_rgba(14,165,233,0.1)]'
+                  } backdrop-blur-xl`}
+                  style={{
+                    backdropFilter: 'blur(20px) saturate(180%)',
+                    WebkitBackdropFilter: 'blur(20px) saturate(180%)'
+                  }}
+                >
+                  <div className={`text-xs font-bold tracking-wider uppercase mb-3 transition-colors duration-500 ${
+                    isDark ? 'text-sky-400' : 'text-sky-600'
+                  }`}>{project.company}</div>
+                  <h3 className={`text-2xl font-bold mb-4 transition-colors duration-500 ${
+                    isDark ? 'text-white' : 'text-slate-900'
+                  }`}>{project.title}</h3>
+                  <p className={`mb-6 leading-relaxed transition-colors duration-500 ${
+                    isDark ? 'text-slate-400' : 'text-slate-600'
+                  }`}>{project.desc}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {project.tags.map((tag, j) => (
+                      <span 
+                        key={j}
+                        className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          isDark ? 'bg-slate-800/50 text-slate-300 border border-slate-700/50' : 'bg-sky-50/50 text-sky-700 border border-sky-200/50'
+                        }`}
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Education Section */}
+        <section 
+          id="education" 
+          ref={sectionRefs.education}
+          className="py-24 px-6 scroll-mt-32"
+        >
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-16">
+              <span className={`text-sm font-semibold tracking-wider uppercase mb-2 block transition-colors duration-500 ${
+                isDark ? 'text-sky-400' : 'text-sky-600'
+              }`}>Academic Background</span>
+              <h2 className={`text-4xl md:text-5xl font-bold mb-4 transition-colors duration-500 ${
+                isDark ? 'text-white' : 'text-slate-900'
+              }`}>Education</h2>
+            </div>
+
+            <div className="max-w-2xl mx-auto">
+              <div className={`p-8 rounded-3xl text-center transition-all duration-500 hover:scale-105 ${
+                isDark 
+                  ? 'bg-slate-900/30 border border-slate-800/50 hover:border-sky-500/20' 
+                  : 'bg-white/40 border border-white/60 hover:border-sky-300/50'
+              } backdrop-blur-xl`}
+              style={{
+                backdropFilter: 'blur(20px) saturate(180%)',
+                WebkitBackdropFilter: 'blur(20px) saturate(180%)'
+              }}
+              >
+                <div className="relative w-24 h-24 mx-auto mb-6">
+                  <img 
+                    src="https://res.cloudinary.com/dqszs1x5y/image/upload/v1771670628/Logo_of_North_Sumatra_University.svg_rs9pkq.png"
+                    alt="Universitas Sumatera Utara Logo"
+                    className={`w-full h-full object-contain rounded-full p-2 transition-colors duration-500 ${
+                      isDark ? 'bg-white/10' : 'bg-white/60'
+                    }`}
+                  />
+                </div>
+                <h3 className={`text-2xl font-bold mb-2 transition-colors duration-500 ${
+                  isDark ? 'text-white' : 'text-slate-900'
+                }`}>Universitas Sumatera Utara</h3>
+                <p className={`text-lg mb-2 ${isDark ? 'text-sky-400' : 'text-sky-600'}`}>
+                  Informatics Engineering Diploma
+                </p>
+                <p className={isDark ? 'text-slate-400' : 'text-slate-600'}>
+                  2013 — 2016
+                </p>
               </div>
-            </motion.div>
-          ))}
-        </div>
-      </section>
+            </div>
+          </div>
+        </section>
 
-      {/* Contact Section */}
-      <section id="contact" className="py-24 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            className={`${cardBaseClasses} p-12 rounded-3xl relative overflow-hidden`}
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-[#0A4D68]/20 to-[#06B6D4]/20" />
-            
-            <div className="relative z-10">
-              <h2 className="text-4xl font-bold mb-6">Thank You and Let's Connect!</h2>
-              <p className={`text-lg mb-8 max-w-xl mx-auto ${mutedText}`}>
-                I'm interested in People Analytics and Data Strategy.
+        {/* Certifications Section */}
+        <section 
+          id="certifications" 
+          ref={sectionRefs.certifications}
+          className="py-24 px-6 scroll-mt-32"
+        >
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-16">
+              <span className={`text-sm font-semibold tracking-wider uppercase mb-2 block transition-colors duration-500 ${
+                isDark ? 'text-sky-400' : 'text-sky-600'
+              }`}>Professional Development</span>
+              <h2 className={`text-4xl md:text-5xl font-bold mb-4 transition-colors duration-500 ${
+                isDark ? 'text-white' : 'text-slate-900'
+              }`}>Certifications</h2>
+            </div>
+
+            <div className="flex flex-col gap-6">
+              <CertificateCard 
+                title="The Project Management Course: Beginner to PROject Manager"
+                provider="Udemy"
+                date="August 2025"
+                description="Certification covering project lifecycle, planning, execution, risk management, and stakeholder communication."
+                credentialLink="https://www.udemy.com/certificate/UC-8f286218-177b-4f0f-9348-4009768a0ab0/"
+                imageLink="https://udemy-certificate.s3.amazonaws.com/image/UC-8f286218-177b-4f0f-9348-4009768a0ab0.jpg?v=1756463361000"
+                isDark={isDark}
+              />
+              
+              <CertificateCard 
+                title="Global HR Management"
+                provider="Udemy"
+                date="July 2025"
+                description="Certification covering Navigating International Talent Acquisition, Engagement, and Retention Strategies."
+                credentialLink="https://www.udemy.com/certificate/UC-dd5c84ac-57a4-4f39-b9d8-84898d437ba5/"
+                imageLink="https://udemy-certificate.s3.amazonaws.com/image/UC-dd5c84ac-57a4-4f39-b9d8-84898d437ba5.jpg?v=1771655522000"
+                isDark={isDark}
+              />
+              
+              {/* Gojek BI University - No credentials available */}
+              <CertificateCard 
+                title="Gojek Business Intelligence University"
+                provider="Advanced Stream"
+                date="2019"
+                description="Business Intelligence Certification covering advanced data analytics, visualization, and strategic decision-making."
+                imageLink="https://res.cloudinary.com/dqszs1x5y/image/upload/v1771746586/1763693079986_ai7dvy.jpg"
+                isDark={isDark}
+                noLink={true}
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* Contact Section */}
+        <section 
+          id="contact" 
+          ref={sectionRefs.contact}
+          className="py-24 px-6 pb-32 scroll-mt-32"
+        >
+          <div className="max-w-4xl mx-auto">
+            <div className={`p-12 rounded-[2.5rem] text-center transition-all duration-500 ${
+              isDark 
+                ? 'bg-gradient-to-br from-sky-950/30 to-slate-900/30 border border-sky-900/20' 
+                : 'bg-gradient-to-br from-sky-50/50 to-cyan-50/50 border border-sky-200/50'
+            } backdrop-blur-2xl`}
+            style={{
+              backdropFilter: 'blur(20px) saturate(180%)',
+              WebkitBackdropFilter: 'blur(20px) saturate(180%)'
+            }}
+            >
+              <h2 className={`text-4xl md:text-5xl font-bold mb-4 transition-colors duration-500 ${
+                isDark ? 'text-white' : 'text-slate-900'
+              }`}>Let's work together</h2>
+              <p className={`text-lg mb-12 max-w-xl mx-auto transition-colors duration-500 ${
+                isDark ? 'text-slate-400' : 'text-slate-600'
+              }`}>
+                Open to discussing data analytics, HR technology, and new opportunities
               </p>
               
-              <div className="flex flex-col sm:flex-row justify-center gap-4">
-                <a
-                  href="mailto:"
-                  onClick={() => trackEvent('click', 'button', 'Send Email')}
-                  className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-white text-black font-bold hover:bg-gray-100 transition-colors"
+              <div className="flex flex-wrap justify-center gap-4">
+                <a 
+                  href="mailto:achmad.f.faiz@gmail.com"
+                  onClick={() => {
+                    // Track email click in GA
+                    if (window.gtag) {
+                      window.gtag('event', 'contact_click', {
+                        event_category: 'conversion',
+                        event_label: 'email'
+                      });
+                    }
+                  }}
+                  className={`flex items-center gap-2 px-8 py-4 rounded-full font-semibold transition-all duration-300 hover:scale-105 ${
+                    isDark 
+                      ? 'bg-slate-800/50 text-white hover:bg-slate-700/50 border border-slate-700/50' 
+                      : 'bg-white/60 text-slate-900 hover:bg-white/80 border border-slate-200/50 shadow-lg'
+                  } backdrop-blur-xl`}
                 >
                   <Mail size={20} />
-                  Send Email
+                  Email
                 </a>
-                <a
-                  href="https://linkedin.com"
+                <a 
+                  href="https://www.linkedin.com/in/achmadf18/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  onClick={() => trackEvent('click', 'external_link', 'LinkedIn')}
-                  className={`inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full font-bold border transition-all ${
-                    darkMode ? "border-white/20 hover:bg-white/10" : "border-gray-300 hover:bg-gray-100"
-                  }`}
+                  onClick={() => {
+                    // Track LinkedIn click in GA
+                    if (window.gtag) {
+                      window.gtag('event', 'contact_click', {
+                        event_category: 'conversion',
+                        event_label: 'linkedin'
+                      });
+                    }
+                  }}
+                  className={`flex items-center gap-2 px-8 py-4 rounded-full font-semibold transition-all duration-300 hover:scale-105 ${
+                    isDark 
+                      ? 'bg-slate-800/50 text-white hover:bg-slate-700/50 border border-slate-700/50' 
+                      : 'bg-white/60 text-slate-900 hover:bg-white/80 border border-slate-200/50 shadow-lg'
+                  } backdrop-blur-xl`}
                 >
                   <Linkedin size={20} />
-                  LinkedIn Profile
+                  LinkedIn
                 </a>
               </div>
             </div>
-          </motion.div>
-          
-          <p className={`mt-12 text-sm ${mutedText}`}>
-            © {new Date().getFullYear()} Achmad Faiz.
-          </p>
-        </div>
-      </section>
+          </div>
+        </section>
+      </main>
+
+      <footer className={`py-8 px-6 text-center transition-colors duration-500 ${
+        isDark ? 'text-slate-600 border-t border-slate-900/50' : 'text-slate-500 border-t border-slate-200/50'
+      }`}>
+        <p>&copy; 2026 Achmad Faiz. All rights reserved.</p>
+      </footer>
     </div>
   );
-}
+};
+
+const App = () => (
+  <ThemeProvider>
+    <Portfolio />
+  </ThemeProvider>
+);
+
+export default App;
